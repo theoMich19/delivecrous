@@ -1,27 +1,61 @@
 import React from 'react';
 import { StyleSheet, Text, View, TouchableOpacity, TextInput, SafeAreaView, StatusBar, ScrollView } from 'react-native';
 
+// Définition des types
 interface ButtonProps {
     title: string;
     onPress: () => void;
-    variant?: 'primary' | 'secondary';
+    variant?: 'primary' | 'secondary' | 'outline';
+    style?: object;
+    textStyle?: object;
+    disabled?: boolean;
+}
+
+interface InputProps {
+    placeholder?: string;
+    label?: string;
+    value?: string;
+    onChangeText?: (text: string) => void;
+    secureTextEntry?: boolean;
+    error?: string;
+    style?: object;
+    keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad' | 'number-pad';
+    autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+}
+
+interface TextComponentProps {
+    children: React.ReactNode;
     style?: object;
 }
 
 // Composant Button
-const Button: React.FC<ButtonProps> = ({ title, onPress, variant = 'primary', style }) => {
+const Button: React.FC<ButtonProps> = ({
+    title,
+    onPress,
+    variant = 'primary',
+    style,
+    textStyle,
+    disabled = false
+}) => {
     return (
         <TouchableOpacity
             style={[
                 styles.button,
-                variant === 'secondary' ? styles.buttonSecondary : null,
+                variant === 'secondary' ? styles.buttonSecondary :
+                    variant === 'outline' ? styles.buttonOutline : styles.buttonPrimary,
+                disabled && styles.buttonDisabled,
                 style
             ]}
             onPress={onPress}
+            disabled={disabled}
+            activeOpacity={0.8}
         >
             <Text style={[
                 styles.buttonText,
-                variant === 'secondary' ? styles.buttonTextSecondary : null
+                variant === 'secondary' ? styles.buttonTextSecondary :
+                    variant === 'outline' ? styles.buttonTextOutline : styles.buttonTextPrimary,
+                disabled && styles.buttonTextDisabled,
+                textStyle
             ]}>
                 {title}
             </Text>
@@ -30,43 +64,52 @@ const Button: React.FC<ButtonProps> = ({ title, onPress, variant = 'primary', st
 };
 
 // Composant Heading (=Titre)
-const Heading: React.FC<{ children: React.ReactNode, style?: object; }> = ({ children, style }) => {
+const Heading: React.FC<TextComponentProps> = ({ children, style }) => {
     return <Text style={[styles.title, style]}>{children}</Text>;
 };
 
 // Composant SubHeading (=Sous-titre)
-const SubHeading: React.FC<{ children: React.ReactNode, style?: object; }> = ({ children, style }) => {
+const SubHeading: React.FC<TextComponentProps> = ({ children, style }) => {
     return <Text style={[styles.subtitle, style]}>{children}</Text>;
 };
 
 // Composant RegularText (=Texte normal)
-const RegularText: React.FC<{ children: React.ReactNode, style?: object; }> = ({ children, style }) => {
+const RegularText: React.FC<TextComponentProps> = ({ children, style }) => {
     return <Text style={[styles.text, style]}>{children}</Text>;
 };
 
-// Composant Input
-interface InputProps {
-    placeholder: string;
-    value?: string;
-    onChangeText?: (text: string) => void;
-    secureTextEntry?: boolean;
-}
-
+// Composant Input amélioré
 const Input: React.FC<InputProps> = ({
     placeholder,
+    label,
     value,
     onChangeText,
-    secureTextEntry = false
+    secureTextEntry = false,
+    error,
+    style,
+    keyboardType = 'default',
+    autoCapitalize = 'sentences',
+    ...props
 }) => {
     return (
-        <TextInput
-            style={styles.input}
-            placeholder={placeholder}
-            placeholderTextColor="#7A869A"
-            value={value}
-            onChangeText={onChangeText}
-            secureTextEntry={secureTextEntry}
-        />
+        <View style={[styles.inputContainer, style]}>
+            {label && <Text style={styles.inputLabel}>{label}</Text>}
+            <TextInput
+                style={[
+                    styles.input,
+                    error ? styles.inputError : null
+                ]}
+                placeholder={placeholder}
+                placeholderTextColor={COLORS.textSecondary}
+                value={value}
+                onChangeText={onChangeText}
+                secureTextEntry={secureTextEntry}
+                keyboardType={keyboardType}
+                autoCapitalize={autoCapitalize}
+                {...props}
+            />
+            {error && <Text style={styles.errorText}>{error}</Text>}
+        </View>
     );
 };
 
@@ -103,7 +146,20 @@ const CrousComponentsPage: React.FC = () => {
 
                     <View style={styles.componentContainer}>
                         <Text style={styles.componentTitle}>Champ de saisie</Text>
-                        <Input placeholder="Numéro INE ou identifiant" />
+                        <Input
+                            label="Identifiant de connexion"
+                            placeholder="Numéro INE ou identifiant"
+                        />
+                    </View>
+
+                    <View style={styles.componentContainer}>
+                        <Text style={styles.componentTitle}>Champ de saisie avec erreur</Text>
+                        <Input
+                            label="Mot de passe"
+                            placeholder="Votre mot de passe"
+                            secureTextEntry
+                            error="Le mot de passe doit contenir au moins 8 caractères"
+                        />
                     </View>
 
                     <View style={styles.componentContainer}>
@@ -119,6 +175,24 @@ const CrousComponentsPage: React.FC = () => {
                             onPress={() => alert('Création de compte')}
                         />
                     </View>
+
+                    <View style={styles.componentContainer}>
+                        <Text style={styles.componentTitle}>Bouton Outline</Text>
+                        <Button
+                            title="Mot de passe oublié"
+                            variant="outline"
+                            onPress={() => alert('Mot de passe oublié')}
+                        />
+                    </View>
+
+                    <View style={styles.componentContainer}>
+                        <Text style={styles.componentTitle}>Bouton Désactivé</Text>
+                        <Button
+                            title="Valider le formulaire"
+                            disabled={true}
+                            onPress={() => alert('Validation')}
+                        />
+                    </View>
                 </View>
             </ScrollView>
         </SafeAreaView>
@@ -129,12 +203,14 @@ const CrousComponentsPage: React.FC = () => {
 const COLORS = {
     primary: '#004A8F', // Bleu marine officiel
     primaryLight: '#0072CE', // Bleu clair
-    secondary: '#EF4123', // Rouge accent
+    secondary: '#00CCBC', // Nouvelle couleur secondaire (Deliveroo style)
+    accent: '#EF4123', // Rouge accent
     background: '#F5F7FA', // Fond gris clair
     cardBg: '#FFFFFF',    // Fond carte
     text: '#333333',      // Texte principal
     textSecondary: '#4E5968', // Texte secondaire
-    border: '#DFE1E6'     // Bordures
+    border: '#DFE1E6',    // Bordures
+    tag: '#F5F5F7',       // Fond des tags
 };
 
 // Styles defauts composants
@@ -193,7 +269,7 @@ const styles = StyleSheet.create({
     subtitle: {
         fontSize: 18,
         fontWeight: '600',
-        color: COLORS.textSecondary,
+        color: COLORS.text,
         marginBottom: 8,
     },
     text: {
@@ -201,6 +277,17 @@ const styles = StyleSheet.create({
         color: COLORS.text,
         lineHeight: 24,
         letterSpacing: 0.1,
+    },
+
+    // Input styles améliorés
+    inputContainer: {
+        marginBottom: 15,
+    },
+    inputLabel: {
+        fontSize: 14,
+        fontWeight: '600',
+        color: COLORS.text,
+        marginBottom: 8,
     },
     input: {
         height: 50,
@@ -212,27 +299,54 @@ const styles = StyleSheet.create({
         color: COLORS.text,
         backgroundColor: COLORS.cardBg,
     },
+    inputError: {
+        borderColor: COLORS.accent,
+    },
+    errorText: {
+        color: COLORS.accent,
+        fontSize: 12,
+        marginTop: 4,
+    },
+
+    // Button styles améliorés
     button: {
-        backgroundColor: COLORS.primary,
         borderRadius: 8,
         paddingVertical: 14,
         paddingHorizontal: 20,
         alignItems: 'center',
         justifyContent: 'center',
     },
+    buttonPrimary: {
+        backgroundColor: COLORS.primary,
+    },
     buttonSecondary: {
+        backgroundColor: COLORS.secondary,
+    },
+    buttonOutline: {
         backgroundColor: 'transparent',
         borderWidth: 2,
         borderColor: COLORS.primary,
     },
+    buttonDisabled: {
+        backgroundColor: COLORS.border,
+        opacity: 0.5,
+    },
     buttonText: {
-        color: 'white',
         fontSize: 16,
         fontWeight: '600',
         letterSpacing: 0.5,
     },
+    buttonTextPrimary: {
+        color: 'white',
+    },
     buttonTextSecondary: {
+        color: 'white',
+    },
+    buttonTextOutline: {
         color: COLORS.primary,
+    },
+    buttonTextDisabled: {
+        color: COLORS.textSecondary,
     },
 });
 
