@@ -1,6 +1,6 @@
-import { Text, View } from "react-native";
-import DeliCrousHome from "./(general)/home";
+import React from 'react';
+import { Redirect } from 'expo-router';
 
 export default function Index() {
-  return <DeliCrousHome />
+  return <Redirect href="/home" />;
 }

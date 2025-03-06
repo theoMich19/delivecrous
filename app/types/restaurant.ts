@@ -12,6 +12,8 @@ export interface Restaurant {
   //reviewsCount: number;
   //categories: string[];
   //meals: Meal[];
+  timeEstimate: string;
+  tags: string[];
   openingHours: OpeningHours;
 }
 

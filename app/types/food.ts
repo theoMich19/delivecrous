@@ -3,9 +3,9 @@ export interface Meal {
   name: string;
   description: string;
   imageUrl: string;
-  price: number;
+  price: string;
   restaurantId: string; // array ?
-  category: string;
+  categoryIds: string[];
   isVegetarian?: boolean;
   isVegan?: boolean;
   isHalal?: boolean;
@@ -15,5 +15,6 @@ export interface Meal {
 export interface Category {
   id: string;
   name: string;
-  imageUrl: string;
+  iconType: string;
+  iconName: string;
 }

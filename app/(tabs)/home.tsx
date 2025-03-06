@@ -1,3 +1,7 @@
+import { RegularText, SubHeading } from '@/components/common/crous-components';
+import { restaurants } from '@/data/mock';
+import { COLORS } from '@/styles/global';
+import { Restaurant } from '@/types/restaurant';
 import React, { useState, useEffect } from 'react';
 import {
     StyleSheet,
@@ -10,148 +14,20 @@ import {
     FlatList,
     ImageBackground
 } from 'react-native';
-import { Button, Heading, SubHeading, RegularText, Input } from '../components/crous-components';
 
-// Types pour nos données
-interface Meal {
-    id: string;
-    name: string;
-    image: string;
-    price: string;
-    categoryIds: string[];
-    description: string;
-    restaurantId: string;
-    allergens?: string[];
-}
-
-interface Restaurant {
-    id: string;
-    name: string;
-    image: string;
-    rating: number;
-    timeEstimate: string;
-    tags: string[];
-}
-
-interface Category {
-    id: string;
-    title: string;
-    image: string;
-}
 
 interface NewsItem {
     id: string;
     title: string;
     summary: string;
     date: string;
-    image: string;
+    imageUrl: string;
 }
 
-const DeliCrousHome: React.FC = () => {
+
+const HomeScreen = () => {
     const [searchText, setSearchText] = useState('');
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-    const [filteredMeals, setFilteredMeals] = useState<Meal[]>([]);
-
-    const restaurants: Restaurant[] = [
-        {
-            id: '1',
-            name: 'RU Luminy',
-            image: '/api/placeholder/400/200',
-            rating: 4.2,
-            timeEstimate: '15-25 min',
-            tags: ['Menu à 1€', 'Végétarien', 'Sur place']
-        },
-        {
-            id: '2',
-            name: 'Cafétéria Canebière',
-            image: '/api/placeholder/400/200',
-            rating: 4.5,
-            timeEstimate: '10-20 min',
-            tags: ['Sandwichs', 'À emporter', 'Menu étudiant']
-        },
-        {
-            id: '3',
-            name: 'RU St-Charles',
-            image: '/api/placeholder/400/200',
-            rating: 3.9,
-            timeEstimate: '20-30 min',
-            tags: ['Menu complet', 'Végétalien', 'Sur place']
-        },
-        {
-            id: '4',
-            name: 'Foodtruck Sciences',
-            image: '/api/placeholder/400/200',
-            rating: 4.7,
-            timeEstimate: '5-15 min',
-            tags: ['Street food', 'Rapide', 'À emporter']
-        },
-    ];
-
-    const categories: Category[] = [
-        { id: 'cat1', title: 'Entrées', image: '/api/placeholder/100/100' },
-        { id: 'cat2', title: 'Plats chauds', image: '/api/placeholder/100/100' },
-        { id: 'cat3', title: 'Végétarien', image: '/api/placeholder/100/100' },
-        { id: 'cat4', title: 'Sandwichs', image: '/api/placeholder/100/100' },
-        { id: 'cat5', title: 'Desserts', image: '/api/placeholder/100/100' },
-        { id: 'cat6', title: 'Boissons', image: '/api/placeholder/100/100' },
-    ];
-
-    const meals: Meal[] = [
-        {
-            id: 'meal1',
-            name: 'Salade César',
-            image: '/api/placeholder/200/200',
-            price: '3,30€',
-            categoryIds: ['cat1', 'cat3'],
-            description: 'Salade, poulet grillé, croûtons, parmesan',
-            restaurantId: '1',
-        },
-        {
-            id: 'meal2',
-            name: 'Lasagnes bolognaise',
-            image: '/api/placeholder/200/200',
-            price: '3,80€',
-            categoryIds: ['cat2'],
-            description: 'Pâtes, viande hachée, sauce tomate, béchamel',
-            restaurantId: '1',
-        },
-        {
-            id: 'meal3',
-            name: 'Burger végétarien',
-            image: '/api/placeholder/200/200',
-            price: '3,50€',
-            categoryIds: ['cat2', 'cat3'],
-            description: 'Steak végétal, cheddar, tomate, salade',
-            restaurantId: '4',
-        },
-        {
-            id: 'meal4',
-            name: 'Sandwich jambon-beurre',
-            image: '/api/placeholder/200/200',
-            price: '2,80€',
-            categoryIds: ['cat4'],
-            description: 'Baguette, jambon, beurre',
-            restaurantId: '2',
-        },
-        {
-            id: 'meal5',
-            name: 'Yaourt nature',
-            image: '/api/placeholder/200/200',
-            price: '0,80€',
-            categoryIds: ['cat5'],
-            description: 'Yaourt nature 125g',
-            restaurantId: '1',
-        },
-        {
-            id: 'meal6',
-            name: 'Eau minérale 50cl',
-            image: '/api/placeholder/200/200',
-            price: '0,70€',
-            categoryIds: ['cat6'],
-            description: 'Bouteille d\'eau 50cl',
-            restaurantId: '3',
-        },
-    ];
 
     const news: NewsItem[] = [
         {
@@ -159,29 +35,23 @@ const DeliCrousHome: React.FC = () => {
             title: 'Menu à 1€ pour tous les étudiants boursiers',
             summary: 'À partir du 1er mars, tous les étudiants boursiers peuvent bénéficier du repas à 1€ dans nos restaurants universitaires.',
             date: '27/02/2025',
-            image: '/api/placeholder/600/300',
+            imageUrl: '/api/placeholder/600/300',
         },
         {
             id: 'news2',
             title: 'Nouveaux horaires pour le RU Saint-Charles',
             summary: 'Le restaurant universitaire Saint-Charles étend ses horaires d\'ouverture jusqu\'à 21h du lundi au vendredi.',
             date: '25/02/2025',
-            image: '/api/placeholder/600/300',
+            imageUrl: '/api/placeholder/600/300',
         },
     ];
 
-    useEffect(() => {
-        if (selectedCategory) {
-            setFilteredMeals(meals.filter(meal => meal.categoryIds.includes(selectedCategory)));
-        } else {
-            setFilteredMeals([]);
-        }
-    }, [selectedCategory]);
+
 
     const renderRestaurantItem = ({ item }: { item: Restaurant }) => (
-        <TouchableOpacity style={styles.restaurantCard} onPress={() => alert(`Voir le menu de ${item.name}`)}>
+        <TouchableOpacity key={item.id} style={styles.restaurantCard} onPress={() => alert(`Voir le menu de ${item.name}`)}>
             <Image
-                source={{ uri: item.image }}
+                source={{ uri: item.imageUrl }}
                 style={styles.restaurantImage}
             />
             <View style={styles.restaurantInfo}>
@@ -203,61 +73,6 @@ const DeliCrousHome: React.FC = () => {
         </TouchableOpacity>
     );
 
-    // Rendu d'une catégorie
-    const renderCategoryItem = ({ item }: { item: Category }) => (
-        <TouchableOpacity
-            style={[
-                styles.categoryItem,
-                selectedCategory === item.id && styles.categoryItemSelected
-            ]}
-            onPress={() => {
-                // Toggle selection
-                setSelectedCategory(selectedCategory === item.id ? null : item.id);
-            }}
-        >
-            <Image
-                source={{ uri: item.image }}
-                style={[
-                    styles.categoryImage,
-                    selectedCategory === item.id && styles.categoryImageSelected
-                ]}
-            />
-            <RegularText
-                style={[
-                    styles.categoryTitle,
-                    selectedCategory === item.id && styles.categoryTitleSelected
-                ]}
-            >
-                {item.title}
-            </RegularText>
-        </TouchableOpacity>
-    );
-
-    // Rendu d'un plat
-    const renderMealItem = ({ item }: { item: Meal }) => {
-        const restaurant = restaurants.find(r => r.id === item.restaurantId);
-
-        return (
-            <TouchableOpacity style={styles.mealCard} onPress={() => alert(`Commander ${item.name}`)}>
-                <Image
-                    source={{ uri: item.image }}
-                    style={styles.mealImage}
-                />
-                <View style={styles.mealInfo}>
-                    <SubHeading style={styles.mealName}>{item.name}</SubHeading>
-                    <RegularText style={styles.mealDescription}>{item.description}</RegularText>
-                    <View style={styles.mealBottom}>
-                        <Text style={styles.mealPrice}>{item.price}</Text>
-                        {restaurant && (
-                            <RegularText style={styles.mealRestaurant}>
-                                {restaurant.name}
-                            </RegularText>
-                        )}
-                    </View>
-                </View>
-            </TouchableOpacity>
-        );
-    };
 
     // Rendu d'une actualité
     const renderNewsItem = ({ item }: { item: NewsItem }) => (
@@ -265,9 +80,12 @@ const DeliCrousHome: React.FC = () => {
             style={styles.newsCard}
             onPress={() => alert(`Lire l'article: ${item.title}`)}
         >
+
             <Image
-                source={{ uri: item.image }}
+                source={typeof item.imageUrl === 'string' ? { uri: item.imageUrl } : item.imageUrl}
                 style={styles.newsImage}
+                defaultSource={require('@assets/images/default42.png')}
+                onError={() => console.log('Erreur de chargement')}
             />
             <View style={styles.newsContent}>
                 <SubHeading style={styles.newsTitle}>{item.title}</SubHeading>
@@ -293,13 +111,13 @@ const DeliCrousHome: React.FC = () => {
                         <View style={styles.profileIcon} />
                     </TouchableOpacity>
                 </View>
-                <View style={styles.searchContainer}>
-                    <Input
-                        placeholder="Rechercher un restaurant, un plat..."
-                        value={searchText}
-                        onChangeText={setSearchText}
-                    />
-                </View>
+                {/* <View style={styles.searchContainer}>
+          <Input
+            placeholder="Rechercher un restaurant, un plat..."
+            value={searchText}
+            onChangeText={setSearchText}
+          />
+        </View> */}
             </View>
 
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -314,61 +132,17 @@ const DeliCrousHome: React.FC = () => {
                     ))}
                 </View>
 
-                {/* Catégories */}
-                <View style={styles.sectionContainer}>
-                    <SubHeading>Catégories</SubHeading>
-                    <FlatList
-                        data={categories}
-                        renderItem={renderCategoryItem}
-                        keyExtractor={item => item.id}
-                        horizontal={true}
-                        showsHorizontalScrollIndicator={false}
-                        contentContainerStyle={styles.categoriesList}
-                    />
-                </View>
 
-                {/* Plats filtrés par catégorie */}
-                {selectedCategory && filteredMeals.length > 0 && (
-                    <View style={styles.sectionContainer}>
-                        <View style={styles.sectionHeader}>
-                            <SubHeading>
-                                {categories.find(c => c.id === selectedCategory)?.title || 'Plats'}
-                            </SubHeading>
-                            <TouchableOpacity onPress={() => setSelectedCategory(null)}>
-                                <RegularText style={styles.clearFilter}>Effacer le filtre</RegularText>
-                            </TouchableOpacity>
-                        </View>
-                        {filteredMeals.map(meal => renderMealItem({ item: meal }))}
-                    </View>
-                )}
-
-                {/* Restaurants */}
                 <View style={styles.sectionContainer}>
                     <SubHeading>Restaurants universitaires</SubHeading>
                     {restaurants.map(restaurant => renderRestaurantItem({ item: restaurant }))}
                 </View>
+
             </ScrollView>
         </SafeAreaView>
     );
 };
 
-// Composant Text natif pour les petits textes sans style complexe
-import { Text } from 'react-native';
-
-// Couleurs CROUS inspirées des sites institutionnels français avec touches Deliveroo
-const COLORS = {
-    primary: '#004A8F', // Bleu marine officiel (CROUS)
-    primaryLight: '#0072CE', // Bleu clair
-    secondary: '#00CCBC', // Couleur Deliveroo adaptée
-    secondaryLight: '#E5F8F7', // Fond léger Deliveroo
-    background: '#F5F7FA', // Fond gris clair
-    cardBg: '#FFFFFF',    // Fond carte
-    text: '#2E3333',      // Texte principal (Deliveroo)
-    textSecondary: '#4E5968', // Texte secondaire
-    border: '#DFE1E6',    // Bordures
-    tag: '#F5F5F7',       // Fond des tags
-    accent: '#EF4123',    // Rouge accent (CROUS)
-};
 
 // Styles pour la page d'accueil
 const styles = StyleSheet.create({
@@ -476,6 +250,21 @@ const styles = StyleSheet.create({
         color: COLORS.secondary,
         fontWeight: 'bold',
     },
+    categoryImageContainer: {
+        width: 70,
+        height: 70,
+        borderRadius: 35,
+        marginBottom: 8,
+        borderWidth: 2,
+        borderColor: 'transparent',
+        backgroundColor: COLORS.secondaryLight,
+        justifyContent: 'center',
+        alignItems: 'center',
+        overflow: 'hidden',
+    },
+    categoryImageContainerSelected: {
+        borderColor: COLORS.secondary,
+    },
     restaurantCard: {
         backgroundColor: COLORS.cardBg,
         borderRadius: 8,
@@ -490,6 +279,7 @@ const styles = StyleSheet.create({
     restaurantImage: {
         width: '100%',
         height: 150,
+        backgroundColor: 'lightgray'
     },
     restaurantInfo: {
         padding: 12,
@@ -578,6 +368,7 @@ const styles = StyleSheet.create({
     newsImage: {
         width: '100%',
         height: 160,
+        backgroundColor: 'lightgray'
     },
     newsContent: {
         padding: 15,
@@ -602,4 +393,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default DeliCrousHome;
+export default HomeScreen;
