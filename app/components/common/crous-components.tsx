@@ -74,8 +74,8 @@ const SubHeading: React.FC<TextComponentProps> = ({ children, style }) => {
 };
 
 // Composant RegularText (=Texte normal)
-const RegularText: React.FC<TextComponentProps> = ({ children, style }) => {
-    return <Text style={[styles.text, style]}>{children}</Text>;
+const RegularText: React.FC<TextComponentProps & { numberOfLines?: number }> = ({ children, style, numberOfLines }) => {
+    return <Text style={[styles.text, style]} numberOfLines={numberOfLines}>{children}</Text>;
 };
 
 // Composant Input amélioré

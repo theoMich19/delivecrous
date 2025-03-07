@@ -1,4 +1,5 @@
 import { RegularText, SubHeading } from '@/components/common/crous-components';
+import Header from '@/components/common/header';
 import { restaurants } from '@/data/mock';
 import { COLORS } from '@/styles/global';
 import { Restaurant } from '@/types/restaurant';
@@ -97,31 +98,8 @@ const HomeScreen = () => {
 
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
-            <View style={styles.header}>
-                <View style={styles.headerTop}>
-                    <View style={styles.locationContainer}>
-                        <RegularText style={styles.deliveryTo}>Livraison à</RegularText>
-                        <TouchableOpacity style={styles.locationSelector}>
-                            <SubHeading style={styles.locationText}>Campus Luminy</SubHeading>
-                            <View style={styles.chevronDown} />
-                        </TouchableOpacity>
-                    </View>
-                    <TouchableOpacity style={styles.profileButton}>
-                        <View style={styles.profileIcon} />
-                    </TouchableOpacity>
-                </View>
-                {/* <View style={styles.searchContainer}>
-          <Input
-            placeholder="Rechercher un restaurant, un plat..."
-            value={searchText}
-            onChangeText={setSearchText}
-          />
-        </View> */}
-            </View>
-
+            <Header />
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-                {/* Dernières actualités */}
                 <View style={styles.sectionContainer}>
                     <SubHeading>Dernières actualités</SubHeading>
                     {news.map((item, index) => (
@@ -131,15 +109,12 @@ const HomeScreen = () => {
                         </View>
                     ))}
                 </View>
-
-
                 <View style={styles.sectionContainer}>
                     <SubHeading>Restaurants universitaires</SubHeading>
                     {restaurants.map(restaurant => renderRestaurantItem({ item: restaurant }))}
                 </View>
-
             </ScrollView>
-        </SafeAreaView>
+        </SafeAreaView >
     );
 };
 
@@ -155,6 +130,9 @@ const styles = StyleSheet.create({
         paddingTop: 10,
         paddingBottom: 15,
         paddingHorizontal: 15,
+    },
+    headerTitle: {
+        color: 'white',
     },
     headerTop: {
         flexDirection: 'row',
