@@ -9,42 +9,69 @@ import {
     Image,
     Modal,
     SafeAreaView,
-    StatusBar,
     Dimensions
 } from 'react-native';
 import { Button, Heading, SubHeading, RegularText, Input } from '@components/common/crous-components';
-import { Category, Meal } from '@/types/food';
-import { Restaurant } from '@/types/restaurant';
-import { categories, meals, restaurants } from '@/data/mock';
+import { MenuService } from '@/services/menu.service';
 import { getCategoryIcon } from '@/components/categories/CategoryIcons';
 import { COLORS } from '@/styles/global';
 import Header from '@/components/common/header';
 import { useCart } from '@/contexts/CartContext';
+import { Category, Meal } from '@/models/food.model';
+import { Restaurant } from '@/models/restaurant.model';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function MenuScreen() {
     const { addToCart } = useCart()
+    const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [meals, setMeals] = useState<Meal[]>([]);
     const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-    const [filteredMeals, setFilteredMeals] = useState<Meal[]>(meals);
+    const [filteredMeals, setFilteredMeals] = useState<Meal[]>([]);
     const [restaurantModalVisible, setRestaurantModalVisible] = useState(false);
     const [searchText, setSearchText] = useState('');
-    const [filteredRestaurants, setFilteredRestaurants] = useState(restaurants);
+    const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>([]);
     const [mealModalVisible, setMealModalVisible] = useState(false);
     const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
 
+    useEffect(() => {
+        loadInitialData();
+    }, []);
+
+    const loadInitialData = async () => {
+        const [restaurantsData, categoriesData, mealsData] = await Promise.all([
+            MenuService.getRestaurants(),
+            MenuService.getCategories(),
+            MenuService.getMeals()
+        ]);
+        setRestaurants(restaurantsData);
+        setCategories(categoriesData);
+        setMeals(mealsData);
+        setFilteredMeals(mealsData);
+        setFilteredRestaurants(restaurantsData);
+    };
 
     useEffect(() => {
-        let filtered = [...meals];
-        if (selectedRestaurant) {
-            filtered = filtered.filter(meal => meal.restaurantId === selectedRestaurant.id);
-        }
-        if (selectedCategory) {
-            filtered = filtered.filter(meal => meal.categoryIds.includes(selectedCategory));
-        }
+        const updateFilteredMeals = async () => {
+            let filtered: Meal[];
+            
+            if (selectedRestaurant && selectedCategory) {
+                const restaurantMeals = await MenuService.getMealsByRestaurant(selectedRestaurant.id);
+                filtered = restaurantMeals.filter(meal => meal.categoryIds.includes(selectedCategory));
+            } else if (selectedRestaurant) {
+                filtered = await MenuService.getMealsByRestaurant(selectedRestaurant.id);
+            } else if (selectedCategory) {
+                filtered = await MenuService.getMealsByCategory(selectedCategory);
+            } else {
+                filtered = meals;
+            }
+            
+            setFilteredMeals(filtered);
+        };
 
-        setFilteredMeals(filtered);
+        updateFilteredMeals();
     }, [selectedRestaurant, selectedCategory]);
 
     useEffect(() => {
@@ -348,7 +375,6 @@ export default function MenuScreen() {
                     )}
                 </View>
 
-
                 <View style={styles.sectionContainer}>
                     <View style={styles.sectionHeader}>
                         <SubHeading>Catégories</SubHeading>
@@ -367,7 +393,6 @@ export default function MenuScreen() {
                         contentContainerStyle={styles.categoriesList}
                     />
                 </View>
-
 
                 <View style={styles.sectionContainer}>
                     <View style={styles.sectionHeader}>
@@ -390,7 +415,6 @@ export default function MenuScreen() {
                     )}
                 </View>
             </ScrollView>
-
 
             <Modal
                 animationType="slide"

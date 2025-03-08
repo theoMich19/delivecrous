@@ -2,9 +2,12 @@ export interface Order {
   id: string;
   userId: string;
   restaurantId: string;
-  meals: OrderItem[];
+  meals: {
+    mealId: string;
+    quantity: number;
+  }[];
   totalPrice: number;
-  status: "pending" | "preparing" | "delivered" | "canceled";
+  status: 'delivered' | 'pending' | 'preparing' | 'canceled';
   createdAt: string;
 }
 

@@ -1,204 +1,157 @@
-import { SubHeading, RegularText, Input, Button, Heading } from '@/components/common/crous-components';
+// app/(tabs)/profile.tsx
+import { SubHeading, RegularText, Button, Heading } from '@/components/common/crous-components';
 import { COLORS } from '@/styles/global';
 import React, { useState } from 'react';
-import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Switch, View, TextInput, TouchableOpacity } from 'react-native';
 
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function ProfileScreen() {
-    const [isLoggedIn, setIsLoggedIn] = useState(false);
-    const [isLogin, setIsLogin] = useState(true);
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirmPassword, setConfirmPassword] = useState('');
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
-    const [rememberMe, setRememberMe] = useState(false);
-    const handleLogin = () => {
-        console.log('Tentative de connexion avec:', email, password);
-        setIsLoggedIn(true);
-    };
-    const handleSignup = () => {
-        if (password !== confirmPassword) {
-            alert('Les mots de passe ne correspondent pas');
-            return;
+    const { user, logout, updateProfile } = useAuth();
+    const [isEditing, setIsEditing] = useState(false);
+    const [phone, setPhone] = useState(user?.phone ?? '');
+    const [address, setAddress] = useState(user?.address ?? '');
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    const handleSaveChanges = async () => {
+        try {
+            setIsLoading(true);
+            setError('');
+            await updateProfile({
+                phone,
+                address
+            });
+            setIsEditing(false);
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setIsLoading(false);
         }
-        console.log('Tentative d\'inscription avec:', email, password, firstName, lastName);
-        setIsLoggedIn(true);
     };
 
-    const handleLogout = () => {
-        setIsLoggedIn(false);
-        setEmail('');
-        setPassword('');
-        setConfirmPassword('');
-        setFirstName('');
-        setLastName('');
+    // Fonction pour formater le numéro de téléphone
+    const formatPhoneNumber = (phone: string) => {
+        // Supprime tous les espaces existants et caractères non numériques
+        const cleaned = phone.replace(/\s+/g, '').replace(/[^\d]/g, '');
+        // Groupe les chiffres par 2
+        const matched = cleaned.match(/.{1,2}/g);
+        // Joint les groupes avec des espaces ou retourne la chaîne vide si null
+        return matched ? matched.join(' ') : '';
     };
 
-    const renderLoggedInProfile = () => (
-        <View style={styles.profileContainer}>
-            <View style={styles.profileHeader}>
-                <View style={styles.profileImagePlaceholder}>
-                    <Heading style={styles.profileInitials}>US</Heading>
-                </View>
-                <SubHeading style={styles.profileName}>Utilisateur CROUS</SubHeading>
-                <RegularText style={styles.profileEmail}>{email}</RegularText>
-            </View>
-
-            <View style={styles.profileSection}>
-                <SubHeading style={styles.sectionTitle}>Mes informations</SubHeading>
-                <View style={styles.profileInfoItem}>
-                    <RegularText style={styles.infoLabel}>Nom</RegularText>
-                    <RegularText>{lastName || 'Non renseigné'}</RegularText>
-                </View>
-                <View style={styles.profileInfoItem}>
-                    <RegularText style={styles.infoLabel}>Prénom</RegularText>
-                    <RegularText>{firstName || 'Non renseigné'}</RegularText>
-                </View>
-                <View style={styles.profileInfoItem}>
-                    <RegularText style={styles.infoLabel}>Email</RegularText>
-                    <RegularText>{email}</RegularText>
-                </View>
-                <View style={styles.profileInfoItem}>
-                    <RegularText style={styles.infoLabel}>Statut</RegularText>
-                    <RegularText>Étudiant</RegularText>
-                </View>
-            </View>
-
-            <View style={styles.profileSection}>
-                <SubHeading style={styles.sectionTitle}>Mes préférences</SubHeading>
-                <View style={styles.profileInfoItem}>
-                    <RegularText style={styles.infoLabel}>Notifications</RegularText>
-                    <Switch
-                        trackColor={{ false: COLORS.border, true: COLORS.secondary }}
-                        thumbColor={COLORS.cardBg}
-                        value={true}
-                        onValueChange={() => { }}
-                    />
-                </View>
-            </View>
-
-            <Button
-                title="Se déconnecter"
-                onPress={handleLogout}
-                variant="secondary"
-                style={styles.logoutButton}
-            />
-        </View>
-    );
-
-    const renderAuthForm = () => (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.authContainer}
-        >
-            <ScrollView contentContainerStyle={styles.scrollContent}>
-                <View style={styles.formHeader}>
-                    <SubHeading style={styles.formTitle}>
-                        {isLogin ? 'Connexion' : 'Créer un compte'}
-                    </SubHeading>
-                    <RegularText style={styles.formSubtitle}>
-                        {isLogin
-                            ? 'Accédez à vos informations personnelles'
-                            : 'Rejoignez la communauté CROUS'
-                        }
-                    </RegularText>
-                </View>
-
-                {!isLogin && (
-                    <>
-                        <Input
-                            label="Prénom"
-                            placeholder="Votre prénom"
-                            value={firstName}
-                            onChangeText={setFirstName}
-                            style={styles.input}
-                        />
-                        <Input
-                            label="Nom"
-                            placeholder="Votre nom"
-                            value={lastName}
-                            onChangeText={setLastName}
-                            style={styles.input}
-                        />
-                    </>
-                )}
-
-                <Input
-                    label="Email"
-                    placeholder="votre@email.com"
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    style={styles.input}
-                />
-
-                <Input
-                    label="Mot de passe"
-                    placeholder="Votre mot de passe"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                    style={styles.input}
-                />
-
-                {!isLogin && (
-                    <Input
-                        label="Confirmez le mot de passe"
-                        placeholder="Confirmez votre mot de passe"
-                        value={confirmPassword}
-                        onChangeText={setConfirmPassword}
-                        secureTextEntry
-                        style={styles.input}
-                    />
-                )}
-
-                {isLogin && (
-                    <View style={styles.rememberContainer}>
-                        <TouchableOpacity
-                            style={styles.rememberMe}
-                            onPress={() => setRememberMe(!rememberMe)}
-                        >
-                            <View style={[styles.checkbox, rememberMe && styles.checkboxChecked]}>
-                                {rememberMe && <View style={styles.checkboxInner} />}
-                            </View>
-                            <RegularText style={styles.rememberText}>Se souvenir de moi</RegularText>
-                        </TouchableOpacity>
-                        <TouchableOpacity>
-                            <RegularText style={styles.forgotPassword}>Mot de passe oublié ?</RegularText>
-                        </TouchableOpacity>
-                    </View>
-                )}
-
-                <Button
-                    title={isLogin ? 'Se connecter' : 'Créer un compte'}
-                    onPress={isLogin ? handleLogin : handleSignup}
-                    style={styles.authButton}
-                />
-
-                <View style={styles.toggleAuthContainer}>
-                    <RegularText style={styles.toggleAuthText}>
-                        {isLogin ? 'Pas encore de compte ?' : 'Déjà un compte ?'}
-                    </RegularText>
-                    <TouchableOpacity onPress={() => setIsLogin(!isLogin)}>
-                        <RegularText style={styles.toggleAuthLink}>
-                            {isLogin ? 'Créer un compte' : 'Se connecter'}
-                        </RegularText>
-                    </TouchableOpacity>
-                </View>
-            </ScrollView>
-        </KeyboardAvoidingView>
-    );
+    // Gestionnaire pour la mise à jour du numéro de téléphone
+    const handlePhoneChange = (text: string) => {
+        // Supprime les espaces pour le stockage
+        const cleaned = text.replace(/\s+/g, '');
+        setPhone(cleaned);
+    };
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <SubHeading style={styles.headerTitle}>Mon Profil</SubHeading>
-            </View>
+            <ScrollView 
+                style={styles.scrollContainer}
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+                bounces={true}
+            >
+                {error ? (
+                    <View style={styles.errorContainer}>
+                        <RegularText style={styles.errorText}>{error}</RegularText>
+                    </View>
+                ) : null}
+                
+                <View style={styles.profileContainer}>
+                    <View style={styles.profileHeader}>
+                        <View style={styles.profileImagePlaceholder}>
+                            <Heading style={styles.profileInitials}>
+                                {user?.name?.split(' ').map(n => n[0]).join('')}
+                            </Heading>
+                        </View>
+                    </View>
 
-            {isLoggedIn ? renderLoggedInProfile() : renderAuthForm()}
+                    <View style={styles.profileSection}>
+                        <View style={styles.sectionHeader}>
+                            <SubHeading style={styles.sectionTitle}>Mes informations</SubHeading>
+                            <TouchableOpacity onPress={() => setIsEditing(!isEditing)}>
+                                <RegularText style={styles.editButton}>
+                                    {isEditing ? 'Annuler' : 'Modifier'}
+                                </RegularText>
+                            </TouchableOpacity>
+                        </View>
+                        <View style={styles.profileInfoItem}>
+                            <RegularText style={styles.infoLabel}>Nom complet</RegularText>
+                            <RegularText>{user?.name}</RegularText>
+                        </View>
+                        <View style={styles.profileInfoItem}>
+                            <RegularText style={styles.infoLabel}>Email</RegularText>
+                            <RegularText>{user?.email}</RegularText>
+                        </View>
+                        <View style={styles.profileInfoItem}>
+                            <RegularText style={styles.infoLabel}>Téléphone</RegularText>
+                            {isEditing ? (
+                                <TextInput
+                                    value={formatPhoneNumber(phone)}
+                                    onChangeText={handlePhoneChange}
+                                    style={styles.input}
+                                    placeholder="Votre téléphone"
+                                    keyboardType="phone-pad"
+                                    maxLength={14} // 10 chiffres + 4 espaces
+                                />
+                            ) : (
+                                <RegularText>
+                                    {user?.phone ? formatPhoneNumber(user.phone) : 'Non renseigné'}
+                                </RegularText>
+                            )}
+                        </View>
+                        <View style={[styles.profileInfoItem, styles.noBorder]}>
+                            <RegularText style={styles.infoLabel}>Adresse</RegularText>
+                            {isEditing ? (
+                                <TextInput
+                                    value={address}
+                                    onChangeText={setAddress}
+                                    style={[styles.input, styles.addressInput]}
+                                    placeholder="Votre adresse"
+                                    multiline
+                                />
+                            ) : (
+                                <RegularText style={styles.addressText}>
+                                    {user?.address ?? 'Non renseignée'}
+                                </RegularText>
+                            )}
+                        </View>
+                        {isEditing && (
+                            <Button
+                                title={isLoading ? "Enregistrement..." : "Enregistrer les modifications"}
+                                onPress={handleSaveChanges}
+                                style={styles.saveButton}
+                                disabled={isLoading}
+                            />
+                        )}
+                    </View>
+
+                    <View style={styles.profileSection}>
+                        <SubHeading style={styles.sectionTitle}>Mes préférences</SubHeading>
+                        <View style={styles.profileInfoItem}>
+                            <RegularText style={styles.infoLabel}>Notifications</RegularText>
+                            <Switch
+                                trackColor={{ false: COLORS.border, true: COLORS.secondary }}
+                                thumbColor={COLORS.cardBg}
+                                value={true}
+                                onValueChange={() => {}}
+                            />
+                        </View>
+                    </View>
+
+                    <Button
+                        title="Se déconnecter"
+                        onPress={logout}
+                        variant="secondary"
+                        style={styles.logoutButton}
+                    />
+                </View>
+            </ScrollView>
         </SafeAreaView>
     );
 }
@@ -208,88 +161,14 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: COLORS.background,
     },
-    header: {
-        backgroundColor: COLORS.primary,
-        padding: 15,
-    },
-    headerTitle: {
-        color: 'white',
-    },
-    authContainer: {
+    scrollContainer: {
         flex: 1,
     },
     scrollContent: {
-        padding: 16,
-    },
-    formHeader: {
-        marginBottom: 24,
-    },
-    formTitle: {
-        fontSize: 22,
-        marginBottom: 8,
-    },
-    formSubtitle: {
-        color: COLORS.textSecondary,
-    },
-    input: {
-        marginBottom: 16,
-    },
-    rememberContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 24,
-    },
-    rememberMe: {
-        flexDirection: 'row',
-        alignItems: 'center',
-    },
-    checkbox: {
-        width: 18,
-        height: 18,
-        borderRadius: 4,
-        borderWidth: 2,
-        borderColor: COLORS.textSecondary,
-        marginRight: 8,
-        justifyContent: 'center',
-        alignItems: 'center',
-    },
-    checkboxChecked: {
-        borderColor: COLORS.secondary,
-        backgroundColor: COLORS.secondary,
-    },
-    checkboxInner: {
-        width: 10,
-        height: 10,
-        backgroundColor: 'white',
-        borderRadius: 2,
-    },
-    rememberText: {
-        color: COLORS.textSecondary,
-        fontSize: 14,
-    },
-    forgotPassword: {
-        color: COLORS.secondary,
-        fontSize: 14,
-    },
-    authButton: {
-        marginBottom: 16,
-    },
-    toggleAuthContainer: {
-        flexDirection: 'row',
-        justifyContent: 'center',
-        marginTop: 16,
-    },
-    toggleAuthText: {
-        color: COLORS.textSecondary,
-        marginRight: 4,
-    },
-    toggleAuthLink: {
-        color: COLORS.secondary,
-        fontWeight: 'bold',
+        flexGrow: 1,
+        paddingBottom: 20,
     },
     profileContainer: {
-        flex: 1,
         padding: 16,
     },
     profileHeader: {
@@ -343,5 +222,49 @@ const styles = StyleSheet.create({
     },
     logoutButton: {
         marginTop: 24,
-    }
+    },
+    errorContainer: {
+        backgroundColor: '#ffebee',
+        padding: 10,
+        margin: 16,
+        borderRadius: 8,
+    },
+    errorText: {
+        color: '#c62828',
+        textAlign: 'center',
+    },
+    sectionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    editButton: {
+        color: COLORS.secondary,
+        fontSize: 14,
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: COLORS.border,
+        borderRadius: 4,
+        padding: 8,
+        minWidth: 150,
+        backgroundColor: COLORS.background,
+    },
+    addressInput: {
+        minHeight: 60,
+        textAlignVertical: 'top',
+        width: '60%',
+    },
+    addressText: {
+        flex: 1,
+        textAlign: 'right',
+        marginLeft: 8,
+    },
+    noBorder: {
+        borderBottomWidth: 0,
+    },
+    saveButton: {
+        marginTop: 16,
+    },
 });

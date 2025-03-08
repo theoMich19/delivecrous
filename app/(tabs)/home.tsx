@@ -1,7 +1,9 @@
 import { RegularText, SubHeading } from '@/components/common/crous-components';
 import Header from '@/components/common/header';
 import { COLORS } from '@/styles/global';
-import React from 'react';
+import { NewsService } from '@/services/news.service';
+import { News } from '@/models/news.model';
+import React, { useState, useEffect } from 'react';
 import {
     StyleSheet,
     View,
@@ -11,42 +13,28 @@ import {
     TouchableOpacity,
 } from 'react-native';
 
-
-interface NewsItem {
-    id: string;
-    title: string;
-    summary: string;
-    date: string;
-    imageUrl: string;
-}
-
-
 const HomeScreen = () => {
-    const news: NewsItem[] = [
-        {
-            id: 'news1',
-            title: 'Menu à 1€ pour tous les étudiants boursiers',
-            summary: 'À partir du 1er mars, tous les étudiants boursiers peuvent bénéficier du repas à 1€ dans nos restaurants universitaires.',
-            date: '27/02/2025',
-            imageUrl: '/api/placeholder/600/300',
-        },
-        {
-            id: 'news2',
-            title: 'Nouveaux horaires pour le RU Saint-Charles',
-            summary: 'Le restaurant universitaire Saint-Charles étend ses horaires d\'ouverture jusqu\'à 21h du lundi au vendredi.',
-            date: '25/02/2025',
-            imageUrl: '/api/placeholder/600/300',
-        },
-    ];
+    const [news, setNews] = useState<News[]>([]);
 
-    const renderNewsItem = ({ item }: { item: NewsItem }) => (
+    useEffect(() => {
+        const loadNews = async () => {
+            try {
+                const newsData = await NewsService.getPublishedNews();
+                setNews(newsData);
+            } catch (error) {
+                console.error('Erreur lors du chargement des news:', error);
+            }
+        };
+        loadNews();
+    }, []);
+
+    const renderNewsItem = ({ item }: { item: News }) => (
         <TouchableOpacity
             style={styles.newsCard}
             onPress={() => alert(`Lire l'article: ${item.title}`)}
         >
-
             <Image
-                source={typeof item.imageUrl === 'string' ? { uri: item.imageUrl } : item.imageUrl}
+                source={{ uri: item.imageUrl }}
                 style={styles.newsImage}
                 defaultSource={require('@assets/images/default42.png')}
                 onError={() => console.log('Erreur de chargement')}
@@ -54,7 +42,9 @@ const HomeScreen = () => {
             <View style={styles.newsContent}>
                 <SubHeading style={styles.newsTitle}>{item.title}</SubHeading>
                 <RegularText style={styles.newsSummary}>{item.summary}</RegularText>
-                <RegularText style={styles.newsDate}>{item.date}</RegularText>
+                <RegularText style={styles.newsDate}>
+                    {new Date(item.publishedAt).toLocaleDateString('fr-FR')}
+                </RegularText>
             </View>
         </TouchableOpacity>
     );
@@ -72,12 +62,10 @@ const HomeScreen = () => {
                         </View>
                     ))}
                 </View>
-
             </ScrollView>
-        </SafeAreaView >
+        </SafeAreaView>
     );
 };
-
 
 const styles = StyleSheet.create({
     container: {

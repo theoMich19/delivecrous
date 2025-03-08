@@ -6,15 +6,20 @@ export interface Restaurant {
   address: string;
   city: string;
   postalCode: string;
-  //latitude: number;
-  //longitude: number;
   rating: number;
-  //reviewsCount: number;
-  //categories: string[];
-  //meals: Meal[];
   timeEstimate: string;
   tags: string[];
-  openingHours: OpeningHours;
+  openingHours: {
+    monday: string;
+    tuesday: string;
+    wednesday: string;
+    thursday: string;
+    friday: string;
+    saturday?: string;
+    sunday?: string;
+  };
+  isOpen?: boolean;
+  minimumOrder?: number;
 }
 
 export interface OpeningHours {
