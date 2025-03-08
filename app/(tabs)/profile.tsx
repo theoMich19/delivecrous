@@ -40,6 +40,8 @@ export default function ProfileScreen() {
             setOrdersLoading(true);
             setOrdersError('');
             const userOrders = await OrderService.getUserOrders();
+            console.log("Données reçues de l'API:", JSON.stringify(userOrders, null, 2));
+
 
             if (Array.isArray(userOrders)) {
                 const validOrders = userOrders.filter(order =>
@@ -66,7 +68,7 @@ export default function ProfileScreen() {
     };
 
     const loadRestaurantInfo = async (restaurantId: string) => {
-        if (restaurantsData[restaurantId]) return; // Déjà chargé
+        if (restaurantsData[restaurantId]) return;
 
         try {
             const restaurant = await MenuService.getRestaurantById(restaurantId);
@@ -137,14 +139,27 @@ export default function ProfileScreen() {
     };
 
     const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        return date.toLocaleDateString('fr-FR', {
-            day: '2-digit',
-            month: '2-digit',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit'
-        });
+        if (!dateString) return "Date inconnue";
+
+        try {
+            const date = new Date(dateString);
+
+            if (isNaN(date.getTime())) {
+                console.warn("Format de date invalide:", dateString);
+                return "Date invalide";
+            }
+
+            return date.toLocaleDateString('fr-FR', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        } catch (error) {
+            console.error("Erreur de formatage de date:", error);
+            return "Erreur de date";
+        }
     };
 
     const getStatusLabel = (status: string) => {
@@ -467,8 +482,6 @@ export default function ProfileScreen() {
                                         title="Voir toutes mes commandes"
                                         variant="secondary"
                                         onPress={() => {
-                                            // Navigation vers une page complète d'historique
-                                            // router.push("/orders/history");
                                             alert("Navigation vers l'historique complet des commandes");
                                         }}
                                         style={styles.viewAllButton}
@@ -615,7 +628,6 @@ const styles = StyleSheet.create({
     saveButton: {
         marginTop: 16,
     },
-    // Styles pour la section des commandes
     loadingContainer: {
         alignItems: 'center',
         padding: 20,
@@ -711,7 +723,6 @@ const styles = StyleSheet.create({
     viewAllButton: {
         marginTop: 10,
     },
-    // Styles modal
     modalOverlay: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.5)',
@@ -758,7 +769,6 @@ const styles = StyleSheet.create({
     cancelOrderButton: {
         backgroundColor: COLORS.accent,
     },
-    // Styles détails commande
     orderDetailSection: {
         marginBottom: 20,
     },

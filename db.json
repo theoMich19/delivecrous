@@ -33,7 +33,9 @@
       "phone": "",
       "address": "",
       "favorites": [],
-      "orders": []
+      "orders": [
+        "1741444188932"
+      ]
     },
     {
       "id": "1741436198633",
@@ -1087,6 +1089,39 @@
         "instructions": ""
       },
       "id": 2
+    },
+    {
+      "restaurantId": "1",
+      "meals": [
+        {
+          "mealId": "meal1",
+          "quantity": 1
+        }
+      ],
+      "totalPrice": 3.3,
+      "deliveryAddress": {
+        "street": "Test",
+        "postalCode": "123456",
+        "city": "Test",
+        "buildingInfo": "",
+        "accessCode": "",
+        "instructions": ""
+      },
+      "id": 3
+    },
+    {
+      "id": "1741444188932",
+      "userId": "1741436146759",
+      "restaurantId": "1",
+      "meals": [
+        {
+          "mealId": "meal1",
+          "quantity": 1
+        }
+      ],
+      "totalPrice": 3.3,
+      "status": "canceled",
+      "createdAt": "2025-03-08T14:29:48.932Z"
     }
   ]
 }
