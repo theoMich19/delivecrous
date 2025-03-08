@@ -576,7 +576,6 @@ export default function ProfileScreen() {
                         )}
                     </View>
 
-                    {/* Section des favoris */}
                     <View style={styles.profileSection}>
                         <View style={styles.sectionHeader}>
                             <SubHeading style={styles.sectionTitle}>Mes plats favoris</SubHeading>

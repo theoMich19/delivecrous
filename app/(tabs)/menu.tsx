@@ -41,6 +41,7 @@ export default function MenuScreen() {
     const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>([]);
     const [mealModalVisible, setMealModalVisible] = useState(false);
     const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
+    const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
 
     useEffect(() => {
         loadInitialData();
@@ -88,6 +89,10 @@ export default function MenuScreen() {
                 filtered = meals;
             }
 
+            if (showOnlyFavorites) {
+                filtered = filtered.filter(meal => favorites.includes(meal.id));
+            }
+
             const sortedMeals = [...filtered].sort((a, b) => {
                 const aIsFavorite = favorites.includes(a.id);
                 const bIsFavorite = favorites.includes(b.id);
@@ -100,7 +105,7 @@ export default function MenuScreen() {
         };
 
         updateFilteredMeals();
-    }, [selectedRestaurant, selectedCategory, favorites]);
+    }, [selectedRestaurant, selectedCategory, favorites, showOnlyFavorites, meals]);
 
     useEffect(() => {
         if (searchText.trim() === '') {
@@ -453,14 +458,48 @@ export default function MenuScreen() {
                                 : "Tous les plats"}
                             {selectedRestaurant && ` - ${selectedRestaurant.name}`}
                         </SubHeading>
+                        <View style={styles.filterActions}>
+                            {user && (
+                                <TouchableOpacity
+                                    style={[
+                                        styles.favoriteFilterButton,
+                                        showOnlyFavorites && styles.favoriteFilterActive
+                                    ]}
+                                    onPress={() => setShowOnlyFavorites(!showOnlyFavorites)}
+                                >
+                                    <Ionicons
+                                        name={showOnlyFavorites ? "heart" : "heart-outline"}
+                                        size={18}
+                                        color={showOnlyFavorites ? COLORS.accent : COLORS.textSecondary}
+                                    />
+                                    <RegularText
+                                        style={[
+                                            styles.favoriteFilterText,
+                                            showOnlyFavorites && styles.favoriteFilterTextActive
+                                        ]}
+                                    >
+                                        Favoris
+                                    </RegularText>
+                                </TouchableOpacity>
+                            )}
+                            {selectedCategory && (
+                                <TouchableOpacity onPress={() => setSelectedCategory(null)}>
+                                    <RegularText style={styles.clearFilter}>Effacer</RegularText>
+                                </TouchableOpacity>
+                            )}
+                        </View>
                     </View>
+
+
 
                     {filteredMeals.length > 0 ? (
                         filteredMeals.map(meal => renderMealItem({ item: meal }))
                     ) : (
                         <View style={styles.emptyStateContainer}>
                             <RegularText style={styles.emptyStateText}>
-                                Aucun plat ne correspond à vos critères de recherche.
+                                {showOnlyFavorites
+                                    ? "Vous n'avez pas encore de plats favoris"
+                                    : "Aucun plat ne correspond à vos critères de recherche."}
                             </RegularText>
                         </View>
                     )}
@@ -920,5 +959,33 @@ const styles = StyleSheet.create({
     },
     favoriteButton: {
         padding: 8,
+    },
+    filterActions: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    favoriteFilterButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: COLORS.cardBg,
+        borderRadius: 16,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        marginRight: 10,
+        borderWidth: 1,
+        borderColor: COLORS.border,
+    },
+    favoriteFilterActive: {
+        backgroundColor: COLORS.secondaryLight,
+        borderColor: COLORS.accent,
+    },
+    favoriteFilterText: {
+        fontSize: 12,
+        marginLeft: 4,
+        color: COLORS.textSecondary,
+    },
+    favoriteFilterTextActive: {
+        color: COLORS.accent,
+        fontWeight: 'bold',
     },
 });
