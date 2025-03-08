@@ -1,19 +1,14 @@
 import { RegularText, SubHeading } from '@/components/common/crous-components';
 import Header from '@/components/common/header';
-import { restaurants } from '@/data/mock';
 import { COLORS } from '@/styles/global';
-import { Restaurant } from '@/types/restaurant';
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
     StyleSheet,
     View,
     SafeAreaView,
-    StatusBar,
     ScrollView,
     Image,
     TouchableOpacity,
-    FlatList,
-    ImageBackground
 } from 'react-native';
 
 
@@ -27,9 +22,6 @@ interface NewsItem {
 
 
 const HomeScreen = () => {
-    const [searchText, setSearchText] = useState('');
-    const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-
     const news: NewsItem[] = [
         {
             id: 'news1',
@@ -47,35 +39,6 @@ const HomeScreen = () => {
         },
     ];
 
-
-
-    const renderRestaurantItem = ({ item }: { item: Restaurant }) => (
-        <TouchableOpacity key={item.id} style={styles.restaurantCard} onPress={() => alert(`Voir le menu de ${item.name}`)}>
-            <Image
-                source={{ uri: item.imageUrl }}
-                style={styles.restaurantImage}
-            />
-            <View style={styles.restaurantInfo}>
-                <SubHeading>{item.name}</SubHeading>
-                <View style={styles.ratingContainer}>
-                    <View style={styles.ratingBadge}>
-                        <RegularText>{item.rating.toFixed(1)}</RegularText>
-                    </View>
-                    <RegularText> • {item.timeEstimate}</RegularText>
-                </View>
-                <View style={styles.tagsContainer}>
-                    {item.tags.map((tag, index) => (
-                        <View key={index} style={styles.tagBadge}>
-                            <RegularText style={styles.tagText}>{tag}</RegularText>
-                        </View>
-                    ))}
-                </View>
-            </View>
-        </TouchableOpacity>
-    );
-
-
-    // Rendu d'une actualité
     const renderNewsItem = ({ item }: { item: NewsItem }) => (
         <TouchableOpacity
             style={styles.newsCard}
@@ -109,17 +72,13 @@ const HomeScreen = () => {
                         </View>
                     ))}
                 </View>
-                <View style={styles.sectionContainer}>
-                    <SubHeading>Restaurants universitaires</SubHeading>
-                    {restaurants.map(restaurant => renderRestaurantItem({ item: restaurant }))}
-                </View>
+
             </ScrollView>
         </SafeAreaView >
     );
 };
 
 
-// Styles pour la page d'accueil
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -291,7 +250,6 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: COLORS.textSecondary,
     },
-    // Styles pour les plats
     mealCard: {
         backgroundColor: COLORS.cardBg,
         borderRadius: 8,
@@ -336,7 +294,6 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: COLORS.textSecondary,
     },
-    // Styles pour les actualités
     newsCard: {
         backgroundColor: COLORS.cardBg,
         borderRadius: 8,

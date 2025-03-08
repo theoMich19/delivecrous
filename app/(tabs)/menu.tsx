@@ -1,4 +1,3 @@
-// app/(tabs)/menu.tsx
 import React, { useState, useEffect } from 'react';
 import {
     StyleSheet,
@@ -20,10 +19,12 @@ import { categories, meals, restaurants } from '@/data/mock';
 import { getCategoryIcon } from '@/components/categories/CategoryIcons';
 import { COLORS } from '@/styles/global';
 import Header from '@/components/common/header';
+import { useCart } from '@/contexts/CartContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function MenuScreen() {
+    const { addToCart } = useCart()
     const [selectedRestaurant, setSelectedRestaurant] = useState<Restaurant | null>(null);
     const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
     const [filteredMeals, setFilteredMeals] = useState<Meal[]>(meals);
@@ -33,14 +34,12 @@ export default function MenuScreen() {
     const [mealModalVisible, setMealModalVisible] = useState(false);
     const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
 
-    // Filtrer les plats en fonction des sélections
+
     useEffect(() => {
         let filtered = [...meals];
-        // Filtrer par restaurant 
         if (selectedRestaurant) {
             filtered = filtered.filter(meal => meal.restaurantId === selectedRestaurant.id);
         }
-        // Filtrer par catégorie 
         if (selectedCategory) {
             filtered = filtered.filter(meal => meal.categoryIds.includes(selectedCategory));
         }
@@ -48,7 +47,6 @@ export default function MenuScreen() {
         setFilteredMeals(filtered);
     }, [selectedRestaurant, selectedCategory]);
 
-    // Filtrer les restaurants lors de la recherche
     useEffect(() => {
         if (searchText.trim() === '') {
             setFilteredRestaurants(restaurants);
@@ -72,7 +70,6 @@ export default function MenuScreen() {
                 selectedCategory === item.id && styles.categoryItemSelected
             ]}
             onPress={() => {
-                // Toggle selection
                 setSelectedCategory(selectedCategory === item.id ? null : item.id);
             }}
         >
@@ -83,10 +80,8 @@ export default function MenuScreen() {
                 ]}
             >
                 {item.iconType === 'svg' ? (
-                    // Afficher l'icône SVG
                     getCategoryIcon(item.id, 40)
                 ) : (
-                    // Fallback pour les images classiques
                     <View></View>
                 )}
             </View>
@@ -133,6 +128,7 @@ export default function MenuScreen() {
 
     const renderRestaurantModalItem = ({ item }: { item: Restaurant }) => (
         <TouchableOpacity
+            key={item.id}
             style={styles.modalRestaurantItem}
             onPress={() => {
                 setSelectedRestaurant(item);
@@ -291,7 +287,9 @@ export default function MenuScreen() {
                         <Button
                             title="Commander ce plat"
                             onPress={() => {
-                                alert(`Commande de ${selectedMeal.name} ajoutée au panier`);
+                                const restaurantName = mealRestaurant ? mealRestaurant.name : "Restaurant inconnu";
+                                addToCart(selectedMeal, restaurantName);
+                                alert(`${selectedMeal.name} ajouté au panier`);
                                 setMealModalVisible(false);
                             }}
                             style={styles.orderButton}
@@ -555,7 +553,6 @@ const styles = StyleSheet.create({
         color: COLORS.secondary,
         fontWeight: 'bold',
     },
-    // Styles pour les plats
     mealCard: {
         backgroundColor: COLORS.cardBg,
         borderRadius: 8,
@@ -622,7 +619,6 @@ const styles = StyleSheet.create({
         textAlign: 'center',
         lineHeight: 22,
     },
-    // Styles pour la modale restaurant
     modalContainer: {
         flex: 1,
         backgroundColor: COLORS.background,
@@ -701,8 +697,6 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: COLORS.textSecondary,
     },
-
-    // Styles pour la modale détail du plat
     mealModalContainer: {
         flex: 1,
         backgroundColor: COLORS.background,

@@ -1,4 +1,3 @@
-// app/(tabs)/profile.tsx
 import { SubHeading, RegularText, Input, Button, Heading } from '@/components/common/crous-components';
 import { COLORS } from '@/styles/global';
 import React, { useState } from 'react';
@@ -7,44 +6,29 @@ import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Switch, Touchab
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function ProfileScreen() {
-    // État pour suivre si l'utilisateur est connecté
     const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-    // État pour basculer entre connexion et création de compte
     const [isLogin, setIsLogin] = useState(true);
-
-    // États pour les formulaires
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [rememberMe, setRememberMe] = useState(false);
-
-    // Fonction de connexion simulée
     const handleLogin = () => {
-        // Ici vous implémenteriez la vraie logique d'authentification
         console.log('Tentative de connexion avec:', email, password);
         setIsLoggedIn(true);
     };
-
-    // Fonction d'inscription simulée
     const handleSignup = () => {
-        // Vérification que les mots de passe correspondent
         if (password !== confirmPassword) {
             alert('Les mots de passe ne correspondent pas');
             return;
         }
-
-        // Ici vous implémenteriez la vraie logique d'inscription
         console.log('Tentative d\'inscription avec:', email, password, firstName, lastName);
         setIsLoggedIn(true);
     };
 
-    // Fonction de déconnexion
     const handleLogout = () => {
         setIsLoggedIn(false);
-        // Réinitialiser les champs du formulaire
         setEmail('');
         setPassword('');
         setConfirmPassword('');
@@ -52,7 +36,6 @@ export default function ProfileScreen() {
         setLastName('');
     };
 
-    // Rendu du profil connecté
     const renderLoggedInProfile = () => (
         <View style={styles.profileContainer}>
             <View style={styles.profileHeader}>
@@ -105,7 +88,6 @@ export default function ProfileScreen() {
         </View>
     );
 
-    // Rendu du formulaire d'authentification
     const renderAuthForm = () => (
         <KeyboardAvoidingView
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -233,8 +215,6 @@ const styles = StyleSheet.create({
     headerTitle: {
         color: 'white',
     },
-
-    // Styles pour l'authentification
     authContainer: {
         flex: 1,
     },
@@ -308,8 +288,6 @@ const styles = StyleSheet.create({
         color: COLORS.secondary,
         fontWeight: 'bold',
     },
-
-    // Styles pour le profil connecté
     profileContainer: {
         flex: 1,
         padding: 16,

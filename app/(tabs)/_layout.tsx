@@ -1,7 +1,6 @@
-// app/(tabs)/_layout.tsx
 import { Tabs } from "expo-router";
-import { HomeIcon, MenuIcon, ProfileIcon } from "@/components/navigation/TabIcons";
 import { COLORS } from "@/styles/global";
+import { HomeIcon, MenuIcon, ProfileIcon, CartIcon } from "@/components/navigation/TabIcons";
 
 export default function TabsLayout() {
     return (
@@ -40,6 +39,13 @@ export default function TabsLayout() {
                 options={{
                     tabBarLabel: "Menu",
                     tabBarIcon: ({ color, size }) => <MenuIcon color={color} size={size} />,
+                }}
+            />
+            <Tabs.Screen
+                name="cart"
+                options={{
+                    tabBarLabel: "Panier",
+                    tabBarIcon: ({ color, size }) => <CartIcon color={color} size={size} />,
                 }}
             />
             <Tabs.Screen
