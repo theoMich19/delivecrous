@@ -2,7 +2,7 @@ import { Tabs } from "expo-router";
 import { COLORS } from "@/styles/global";
 import { HomeIcon, MenuIcon, ProfileIcon, CartIcon } from "@/components/navigation/TabIcons";
 
-export default function TabsLayout() {
+export default function TabLayout() {
     return (
         <Tabs
             screenOptions={{

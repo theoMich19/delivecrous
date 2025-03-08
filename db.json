@@ -1,0 +1,1044 @@
+{
+  "users": [
+    {
+      "id": "1",
+      "name": "John Doe",
+      "email": "john@example.com",
+      "password": "hashedPassword123",
+      "phone": "0612345678",
+      "avatarUrl": "",
+      "favorites": [],
+      "orders": [],
+      "address": "123 Rue de Paris"
+    },
+    {
+      "id": "1741292523873",
+      "email": "ilanlicha22@gmail.com",
+      "password": "$2a$10$HKIurn7yB.Re1ZKrJzmBE.cLR79VR7.84J5mtz2ITkMPbdTG9VFnO",
+      "name": "Ilan Licha",
+      "favorites": [
+        "meal1",
+        "meal4",
+        "meal19"
+      ],
+      "orders": [],
+      "phone": "0781818757",
+      "address": "101 rue de la republique 69150"
+    },
+    {
+      "id": "1741445263142",
+      "email": "theo.michellon@gmail.com",
+      "password": "$2a$10$oIB4abyKYL0m58IeRIfyyOFHdHWsNo5uKVP.TMy0yq68YWZdhmYgy",
+      "name": "Theo Michellon",
+      "phone": "",
+      "address": "",
+      "favorites": [
+        "meal1"
+      ],
+      "orders": [
+        "1741445287651"
+      ]
+    }
+  ],
+  "restaurants": [
+    {
+      "id": "1",
+      "name": "RU Luminy",
+      "description": "Restaurant universitaire situé sur le campus de Luminy. Propose des menus variés et équilibrés à prix étudiant.",
+      "imageUrl": "https://placehold.co/600x400",
+      "address": "163 Avenue de Luminy",
+      "city": "Marseille",
+      "postalCode": "13009",
+      "rating": 4.2,
+      "timeEstimate": "15-25 min",
+      "tags": [
+        "Menu à 1€",
+        "Végétarien",
+        "Sur place"
+      ],
+      "openingHours": {
+        "monday": "11h00-14h00",
+        "tuesday": "11h00-14h00",
+        "wednesday": "11h00-14h00",
+        "thursday": "11h00-14h00",
+        "friday": "11h00-14h00"
+      }
+    },
+    {
+      "id": "2",
+      "name": "Cafétéria Canebière",
+      "description": "Cafétéria universitaire située en plein centre-ville. Parfait pour une pause déjeuner rapide.",
+      "imageUrl": "https://placehold.co/600x400",
+      "address": "110 La Canebière",
+      "city": "Marseille",
+      "postalCode": "13001",
+      "rating": 4.5,
+      "timeEstimate": "10-20 min",
+      "tags": [
+        "Sandwichs",
+        "À emporter",
+        "Menu étudiant"
+      ],
+      "openingHours": {
+        "monday": "08h00-18h00",
+        "tuesday": "08h00-18h00",
+        "wednesday": "08h00-18h00",
+        "thursday": "08h00-18h00",
+        "friday": "08h00-18h00",
+        "saturday": "10h00-15h00"
+      }
+    },
+    {
+      "id": "3",
+      "name": "RU St-Charles",
+      "description": "Restaurant universitaire du campus Saint-Charles proposant une cuisine diversifiée avec des options végétaliennes.",
+      "imageUrl": "https://placehold.co/600x400",
+      "address": "3 Place Victor Hugo",
+      "city": "Marseille",
+      "postalCode": "13003",
+      "rating": 3.9,
+      "timeEstimate": "20-30 min",
+      "tags": [
+        "Menu complet",
+        "Végétalien",
+        "Sur place"
+      ],
+      "openingHours": {
+        "monday": "11h30-14h00",
+        "tuesday": "11h30-14h00",
+        "wednesday": "11h30-14h00",
+        "thursday": "11h30-14h00",
+        "friday": "11h30-14h00"
+      }
+    },
+    {
+      "id": "4",
+      "name": "Foodtruck Sciences",
+      "description": "Food truck proposant une cuisine rapide et créative, situé sur le campus scientifique.",
+      "imageUrl": "https://placehold.co/600x400",
+      "address": "52 Avenue Escadrille Normandie Niemen",
+      "city": "Marseille",
+      "postalCode": "13013",
+      "rating": 4.7,
+      "timeEstimate": "5-15 min",
+      "tags": [
+        "Street food",
+        "Rapide",
+        "À emporter"
+      ],
+      "openingHours": {
+        "monday": "11h00-15h00",
+        "tuesday": "11h00-15h00",
+        "wednesday": "11h00-15h00",
+        "thursday": "11h00-15h00",
+        "friday": "11h00-15h00"
+      }
+    },
+    {
+      "id": "5",
+      "name": "Cafet' Médecine",
+      "description": "Cafétéria située dans la faculté de médecine. Idéale pour une pause café ou un repas léger.",
+      "imageUrl": "https://placehold.co/600x400",
+      "address": "27 Boulevard Jean Moulin",
+      "city": "Marseille",
+      "postalCode": "13005",
+      "rating": 4,
+      "timeEstimate": "5-10 min",
+      "tags": [
+        "Snacks",
+        "Boissons",
+        "Café",
+        "À emporter"
+      ],
+      "openingHours": {
+        "monday": "07h30-17h00",
+        "tuesday": "07h30-17h00",
+        "wednesday": "07h30-17h00",
+        "thursday": "07h30-17h00",
+        "friday": "07h30-16h00"
+      }
+    },
+    {
+      "id": "6",
+      "name": "Brasserie des Arts",
+      "description": "Brasserie universitaire proposant des plats traditionnels dans un cadre convivial.",
+      "imageUrl": "https://placehold.co/600x400",
+      "address": "29 Avenue Robert Schuman",
+      "city": "Aix-en-Provence",
+      "postalCode": "13100",
+      "rating": 4.3,
+      "timeEstimate": "15-25 min",
+      "tags": [
+        "Brasserie",
+        "Sur place",
+        "Terrasse"
+      ],
+      "openingHours": {
+        "monday": "11h00-15h00",
+        "tuesday": "11h00-15h00",
+        "wednesday": "11h00-15h00",
+        "thursday": "11h00-15h00",
+        "friday": "11h00-15h00",
+        "saturday": "11h00-14h00"
+      }
+    },
+    {
+      "id": "7",
+      "name": "Crous Truck",
+      "description": "Food truck du CROUS proposant une cuisine rapide, variée et économique.",
+      "imageUrl": "https://placehold.co/600x400",
+      "address": "Campus de Saint-Jérôme",
+      "city": "Marseille",
+      "postalCode": "13013",
+      "rating": 4.1,
+      "timeEstimate": "5-15 min",
+      "tags": [
+        "Food truck",
+        "Menu étudiant",
+        "À emporter"
+      ],
+      "openingHours": {
+        "monday": "11h30-14h00",
+        "tuesday": "11h30-14h00",
+        "wednesday": "11h30-14h00",
+        "thursday": "11h30-14h00",
+        "friday": "11h30-14h00"
+      }
+    },
+    {
+      "id": "8",
+      "name": "Resto U Gaston Berger",
+      "description": "Grand restaurant universitaire offrant une large gamme de plats dans un espace lumineux et moderne.",
+      "imageUrl": "https://placehold.co/600x400",
+      "address": "413 Avenue Gaston Berger",
+      "city": "Aix-en-Provence",
+      "postalCode": "13100",
+      "rating": 4.4,
+      "timeEstimate": "15-30 min",
+      "tags": [
+        "Cuisine internationale",
+        "Menu à 1€",
+        "Sur place"
+      ],
+      "openingHours": {
+        "monday": "11h00-14h00",
+        "tuesday": "11h00-14h00",
+        "wednesday": "11h00-14h00",
+        "thursday": "11h00-14h00",
+        "friday": "11h00-14h00"
+      }
+    },
+    {
+      "id": "9",
+      "name": "Cafétéria Château-Gombert",
+      "description": "Cafétéria de l'école d'ingénieurs proposant des formules rapides et équilibrées.",
+      "imageUrl": "https://placehold.co/600x400",
+      "address": "60 Rue Joliot Curie",
+      "city": "Marseille",
+      "postalCode": "13013",
+      "rating": 3.8,
+      "timeEstimate": "10-15 min",
+      "tags": [
+        "Formules midi",
+        "Sandwichs",
+        "À emporter"
+      ],
+      "openingHours": {
+        "monday": "08h00-16h00",
+        "tuesday": "08h00-16h00",
+        "wednesday": "08h00-16h00",
+        "thursday": "08h00-16h00",
+        "friday": "08h00-15h00"
+      }
+    },
+    {
+      "id": "10",
+      "name": "L'Epicurien",
+      "description": "Restaurant universitaire haut de gamme proposant une cuisine raffinée à prix accessibles.",
+      "imageUrl": "https://placehold.co/600x400",
+      "address": "58 Boulevard Charles Livon",
+      "city": "Marseille",
+      "postalCode": "13007",
+      "rating": 4.6,
+      "timeEstimate": "20-35 min",
+      "tags": [
+        "Gastronomique",
+        "Sur place",
+        "Réservation conseillée"
+      ],
+      "openingHours": {
+        "monday": "11h30-14h30",
+        "tuesday": "11h30-14h30",
+        "wednesday": "11h30-14h30",
+        "thursday": "11h30-14h30",
+        "friday": "11h30-14h30"
+      }
+    }
+  ],
+  "categories": [
+    {
+      "id": "cat1",
+      "name": "Plats",
+      "iconType": "svg",
+      "iconName": "main-dish"
+    },
+    {
+      "id": "cat2",
+      "name": "Sandwichs",
+      "iconType": "svg",
+      "iconName": "sandwich"
+    },
+    {
+      "id": "cat3",
+      "name": "Desserts",
+      "iconType": "svg",
+      "iconName": "dessert"
+    },
+    {
+      "id": "cat4",
+      "name": "Boissons",
+      "iconType": "svg",
+      "iconName": "drink"
+    },
+    {
+      "id": "cat5",
+      "name": "Végétarien",
+      "iconType": "svg",
+      "iconName": "vegetarian"
+    },
+    {
+      "id": "cat6",
+      "name": "Promotions",
+      "iconType": "svg",
+      "iconName": "promotion"
+    }
+  ],
+  "meals": [
+    {
+      "id": "meal1",
+      "name": "Salade César",
+      "imageUrl": "/api/placeholder/400/300",
+      "price": "3,30€",
+      "categoryIds": [
+        "cat1",
+        "cat5"
+      ],
+      "description": "Salade composée avec du poulet grillé, des croûtons à l'ail et du parmesan, le tout assaisonné d'une sauce César crémeuse.",
+      "restaurantId": "1",
+      "ingredients": [
+        "Salade romaine",
+        "Filet de poulet grillé",
+        "Croûtons à l'ail",
+        "Parmesan AOP",
+        "Sauce César maison"
+      ],
+      "allergens": [
+        "Gluten",
+        "Lactose",
+        "Œuf",
+        "Poisson"
+      ],
+      "nutritionalInfo": {
+        "Calories": "320 kcal",
+        "Protéines": "22g",
+        "Glucides": "15g",
+        "Lipides": "18g",
+        "Sel": "1.2g"
+      },
+      "isVegetarian": false,
+      "isVegan": false,
+      "isGlutenFree": false,
+      "preparationTime": "10 min",
+      "popularity": 4
+    },
+    {
+      "id": "meal2",
+      "name": "Lasagnes bolognaise",
+      "imageUrl": "/api/placeholder/400/300",
+      "price": "3,80€",
+      "categoryIds": [
+        "cat1"
+      ],
+      "description": "Lasagnes traditionnelles à la bolognaise, préparées avec une sauce tomate mijotée, de la viande de bœuf hachée et une béchamel onctueuse, le tout gratinés au four.",
+      "restaurantId": "1",
+      "ingredients": [
+        "Pâtes à lasagne",
+        "Viande de bœuf hachée",
+        "Sauce tomate",
+        "Oignons",
+        "Carottes",
+        "Béchamel",
+        "Emmental râpé"
+      ],
+      "allergens": [
+        "Gluten",
+        "Lactose",
+        "Œuf"
+      ],
+      "nutritionalInfo": {
+        "Calories": "450 kcal",
+        "Protéines": "25g",
+        "Glucides": "42g",
+        "Lipides": "22g",
+        "Sel": "1.5g"
+      },
+      "isVegetarian": false,
+      "isVegan": false,
+      "isGlutenFree": false,
+      "preparationTime": "15 min",
+      "popularity": 5,
+      "inPromotion": true,
+      "promotionPrice": "3,00€"
+    },
+    {
+      "id": "meal3",
+      "name": "Burger végétarien",
+      "imageUrl": "/api/placeholder/400/300",
+      "price": "3,50€",
+      "categoryIds": [
+        "cat1",
+        "cat5"
+      ],
+      "description": "Burger végétarien avec steak de légumes maison, fromage, tomates fraîches et salade croquante, servi dans un pain aux céréales.",
+      "restaurantId": "4",
+      "ingredients": [
+        "Pain burger aux céréales",
+        "Steak végétal (légumineuses, légumes)",
+        "Cheddar",
+        "Tomate",
+        "Salade",
+        "Sauce maison"
+      ],
+      "allergens": [
+        "Gluten",
+        "Lactose",
+        "Fruits à coque"
+      ],
+      "nutritionalInfo": {
+        "Calories": "380 kcal",
+        "Protéines": "15g",
+        "Glucides": "45g",
+        "Lipides": "16g",
+        "Sel": "1.3g"
+      },
+      "isVegetarian": true,
+      "isVegan": false,
+      "isGlutenFree": false,
+      "preparationTime": "12 min",
+      "popularity": 4
+    },
+    {
+      "id": "meal4",
+      "name": "Sandwich jambon-beurre",
+      "imageUrl": "/api/placeholder/400/300",
+      "price": "2,80€",
+      "categoryIds": [
+        "cat2"
+      ],
+      "description": "Le classique jambon-beurre dans une baguette croustillante, préparé avec du jambon blanc de qualité et du beurre demi-sel.",
+      "restaurantId": "2",
+      "ingredients": [
+        "Baguette traditionnelle",
+        "Jambon blanc",
+        "Beurre demi-sel"
+      ],
+      "allergens": [
+        "Gluten",
+        "Lactose"
+      ],
+      "nutritionalInfo": {
+        "Calories": "320 kcal",
+        "Protéines": "15g",
+        "Glucides": "35g",
+        "Lipides": "12g",
+        "Sel": "1.8g"
+      },
+      "isVegetarian": false,
+      "isVegan": false,
+      "isGlutenFree": false,
+      "preparationTime": "3 min",
+      "popularity": 4
+    },
+    {
+      "id": "meal5",
+      "name": "Buddha Bowl Végétalien",
+      "imageUrl": "/api/placeholder/400/300",
+      "price": "4,20€",
+      "categoryIds": [
+        "cat1",
+        "cat5"
+      ],
+      "description": "Bowl équilibré à base de quinoa, légumes de saison, avocat, pois chiches grillés et sauce tahini maison. Un repas complet, sain et savoureux.",
+      "restaurantId": "3",
+      "ingredients": [
+        "Quinoa",
+        "Pois chiches grillés",
+        "Avocat",
+        "Carottes râpées",
+        "Concombre",
+        "Tomates cerises",
+        "Épinards frais",
+        "Sauce tahini"
+      ],
+      "allergens": [
+        "Sésame"
+      ],
+      "nutritionalInfo": {
+        "Calories": "380 kcal",
+        "Protéines": "12g",
+        "Glucides": "45g",
+        "Lipides": "17g",
+        "Fibres": "9g",
+        "Sel": "0.8g"
+      },
+      "isVegetarian": true,
+      "isVegan": true,
+      "isGlutenFree": true,
+      "preparationTime": "10 min",
+      "popularity": 4
+    },
+    {
+      "id": "meal6",
+      "name": "Poulet Curry & Riz",
+      "imageUrl": "/api/placeholder/400/300",
+      "price": "4,00€",
+      "categoryIds": [
+        "cat1"
+      ],
+      "description": "Émincé de poulet au curry doux, servi avec du riz basmati et des légumes. Un plat savoureux inspiré de la cuisine indienne.",
+      "restaurantId": "8",
+      "ingredients": [
+        "Filet de poulet",
+        "Riz basmati",
+        "Oignons",
+        "Poivrons",
+        "Lait de coco",
+        "Épices curry",
+        "Coriandre fraîche"
+      ],
+      "allergens": [
+        "Lactose"
+      ],
+      "nutritionalInfo": {
+        "Calories": "450 kcal",
+        "Protéines": "28g",
+        "Glucides": "50g",
+        "Lipides": "12g",
+        "Sel": "1.1g"
+      },
+      "isVegetarian": false,
+      "isVegan": false,
+      "isGlutenFree": true,
+      "isHalal": true,
+      "preparationTime": "15 min",
+      "popularity": 5
+    },
+    {
+      "id": "meal7",
+      "name": "Wrap Thon-Crudités",
+      "imageUrl": "/api/placeholder/400/300",
+      "price": "3,20€",
+      "categoryIds": [
+        "cat2"
+      ],
+      "description": "Wrap frais garni de thon, crudités croquantes et sauce légère. Une option équilibrée et pratique à emporter.",
+      "restaurantId": "5",
+      "ingredients": [
+        "Tortilla de blé",
+        "Thon au naturel",
+        "Tomate",
+        "Salade",
+        "Concombre",
+        "Maïs",
+        "Sauce légère au yaourt"
+      ],
+      "allergens": [
+        "Gluten",
+        "Poisson",
+        "Lactose"
+      ],
+      "nutritionalInfo": {
+        "Calories": "310 kcal",
+        "Protéines": "18g",
+        "Glucides": "35g",
+        "Lipides": "10g",
+        "Sel": "1.3g"
+      },
+      "isVegetarian": false,
+      "isVegan": false,
+      "isGlutenFree": false,
+      "preparationTime": "5 min",
+      "popularity": 3
+    },
+    {
+      "id": "meal8",
+      "name": "Tarte aux Pommes",
+      "imageUrl": "/api/placeholder/400/300",
+      "price": "2,10€",
+      "categoryIds": [
+        "cat3"
+      ],
+      "description": "Tarte aux pommes traditionnelle avec une pâte feuilletée croustillante et des pommes caramélisées légèrement parfumées à la cannelle.",
+      "restaurantId": "6",
+      "ingredients": [
+        "Pâte feuilletée",
+        "Pommes",
+        "Sucre",
+        "Cannelle",
+        "Beurre"
+      ],
+      "allergens": [
+        "Gluten",
+        "Lactose",
+        "Œuf"
+      ],
+      "nutritionalInfo": {
+        "Calories": "280 kcal",
+        "Protéines": "3g",
+        "Glucides": "40g",
+        "Lipides": "12g",
+        "Sucres": "22g"
+      },
+      "isVegetarian": true,
+      "isVegan": false,
+      "isGlutenFree": false,
+      "preparationTime": "0 min (prêt à servir)",
+      "popularity": 4
+    },
+    {
+      "id": "meal9",
+      "name": "Smoothie Fruits Rouges",
+      "imageUrl": "/api/placeholder/400/300",
+      "price": "2,50€",
+      "categoryIds": [
+        "cat4",
+        "cat3"
+      ],
+      "description": "Smoothie rafraîchissant aux fruits rouges, préparé avec des fruits frais et un yaourt nature. Riche en vitamines et antioxydants.",
+      "restaurantId": "7",
+      "ingredients": [
+        "Fraises",
+        "Framboises",
+        "Myrtilles",
+        "Yaourt nature",
+        "Miel"
+      ],
+      "allergens": [
+        "Lactose"
+      ],
+      "nutritionalInfo": {
+        "Calories": "180 kcal",
+        "Protéines": "5g",
+        "Glucides": "30g",
+        "dont Sucres": "25g",
+        "Lipides": "2g"
+      },
+      "isVegetarian": true,
+      "isVegan": false,
+      "isGlutenFree": true,
+      "preparationTime": "3 min",
+      "popularity": 5
+    },
+    {
+      "id": "meal10",
+      "name": "Poke Bowl Saumon",
+      "imageUrl": "/api/placeholder/400/300",
+      "price": "5,50€",
+      "categoryIds": [
+        "cat1",
+        "cat6"
+      ],
+      "description": "Bowl hawaïen à base de riz, saumon frais mariné, avocat, concombre et graines de sésame. Un repas complet, frais et équilibré.",
+      "restaurantId": "10",
+      "ingredients": [
+        "Riz japonais",
+        "Saumon frais",
+        "Avocat",
+        "Concombre",
+        "Carottes",
+        "Edamame",
+        "Sauce soja",
+        "Graines de sésame"
+      ],
+      "allergens": [
+        "Poisson",
+        "Soja",
+        "Sésame"
+      ],
+      "nutritionalInfo": {
+        "Calories": "420 kcal",
+        "Protéines": "25g",
+        "Glucides": "45g",
+        "Lipides": "16g",
+        "Sel": "1.2g"
+      },
+      "isVegetarian": false,
+      "isVegan": false,
+      "isGlutenFree": true,
+      "preparationTime": "10 min",
+      "popularity": 5,
+      "inPromotion": true,
+      "promotionPrice": "4,50€"
+    },
+    {
+      "id": "meal11",
+      "name": "Panini 3 Fromages",
+      "imageUrl": "/api/placeholder/400/300",
+      "price": "3,20€",
+      "categoryIds": [
+        "cat2",
+        "cat5"
+      ],
+      "description": "Panini chaud garni de mozzarella, cheddar et chèvre, avec un soupçon de pesto. Croustillant à l'extérieur et fondant à l'intérieur.",
+      "restaurantId": "9",
+      "ingredients": [
+        "Pain panini",
+        "Mozzarella",
+        "Cheddar",
+        "Fromage de chèvre",
+        "Tomate",
+        "Pesto basilic"
+      ],
+      "allergens": [
+        "Gluten",
+        "Lactose",
+        "Fruits à coque"
+      ],
+      "nutritionalInfo": {
+        "Calories": "380 kcal",
+        "Protéines": "18g",
+        "Glucides": "40g",
+        "Lipides": "20g",
+        "Sel": "1.5g"
+      },
+      "isVegetarian": true,
+      "isVegan": false,
+      "isGlutenFree": false,
+      "preparationTime": "7 min",
+      "popularity": 4
+    },
+    {
+      "id": "meal12",
+      "name": "Salade de Fruits Frais",
+      "imageUrl": "/api/placeholder/400/300",
+      "price": "2,20€",
+      "categoryIds": [
+        "cat3",
+        "cat5"
+      ],
+      "description": "Salade composée de fruits frais de saison, parfaite pour un dessert léger et vitaminé.",
+      "restaurantId": "2",
+      "ingredients": [
+        "Pomme",
+        "Banane",
+        "Orange",
+        "Kiwi",
+        "Raisin",
+        "Jus de citron"
+      ],
+      "allergens": [],
+      "nutritionalInfo": {
+        "Calories": "120 kcal",
+        "Protéines": "1g",
+        "Glucides": "25g",
+        "dont Sucres": "22g",
+        "Lipides": "0.5g"
+      },
+      "isVegetarian": true,
+      "isVegan": true,
+      "isGlutenFree": true,
+      "preparationTime": "0 min (prêt à servir)",
+      "popularity": 3
+    },
+    {
+      "id": "meal13",
+      "name": "Nuggets de Poulet & Frites",
+      "imageUrl": "/api/placeholder/400/300",
+      "price": "3,90€",
+      "categoryIds": [
+        "cat1",
+        "cat6"
+      ],
+      "description": "Nuggets de poulet croustillants servis avec des frites maison et sauce au choix. Un classique revisité.",
+      "restaurantId": "4",
+      "ingredients": [
+        "Filet de poulet pané",
+        "Pommes de terre",
+        "Huile de tournesol",
+        "Épices",
+        "Sauce au choix"
+      ],
+      "allergens": [
+        "Gluten",
+        "Œuf"
+      ],
+      "nutritionalInfo": {
+        "Calories": "550 kcal",
+        "Protéines": "22g",
+        "Glucides": "55g",
+        "Lipides": "28g",
+        "Sel": "1.7g"
+      },
+      "isVegetarian": false,
+      "isVegan": false,
+      "isGlutenFree": false,
+      "isHalal": true,
+      "preparationTime": "12 min",
+      "popularity": 5,
+      "inPromotion": true,
+      "promotionPrice": "3,40€"
+    },
+    {
+      "id": "meal14",
+      "name": "Eau Minérale 50cl",
+      "imageUrl": "/api/placeholder/400/300",
+      "price": "0,70€",
+      "categoryIds": [
+        "cat4"
+      ],
+      "description": "Bouteille d'eau minérale naturelle de 50cl.",
+      "restaurantId": "3",
+      "ingredients": [
+        "Eau minérale naturelle"
+      ],
+      "allergens": [],
+      "nutritionalInfo": {
+        "Calories": "0 kcal",
+        "Minéraux": "Selon source"
+      },
+      "isVegetarian": true,
+      "isVegan": true,
+      "isGlutenFree": true,
+      "preparationTime": "0 min",
+      "popularity": 4
+    },
+    {
+      "id": "meal15",
+      "name": "Café Expresso",
+      "imageUrl": "/api/placeholder/400/300",
+      "price": "0,90€",
+      "categoryIds": [
+        "cat4"
+      ],
+      "description": "Expresso fraîchement préparé avec un café 100% arabica. Idéal pour une pause énergisante.",
+      "restaurantId": "5",
+      "ingredients": [
+        "Café arabica"
+      ],
+      "allergens": [],
+      "nutritionalInfo": {
+        "Calories": "2 kcal",
+        "Caféine": "80mg"
+      },
+      "isVegetarian": true,
+      "isVegan": true,
+      "isGlutenFree": true,
+      "preparationTime": "1 min",
+      "popularity": 5
+    },
+    {
+      "id": "meal16",
+      "name": "Quiche Lorraine",
+      "imageUrl": "/api/placeholder/400/300",
+      "price": "2,80€",
+      "categoryIds": [
+        "cat1"
+      ],
+      "description": "Quiche traditionnelle au jambon et lardons, avec une pâte brisée maison et une garniture crémeuse aux œufs.",
+      "restaurantId": "6",
+      "ingredients": [
+        "Pâte brisée",
+        "Lardons",
+        "Jambon",
+        "Œufs",
+        "Crème fraîche",
+        "Emmental râpé"
+      ],
+      "allergens": [
+        "Gluten",
+        "Œuf",
+        "Lactose"
+      ],
+      "nutritionalInfo": {
+        "Calories": "320 kcal",
+        "Protéines": "15g",
+        "Glucides": "22g",
+        "Lipides": "20g",
+        "Sel": "1.6g"
+      },
+      "isVegetarian": false,
+      "isVegan": false,
+      "isGlutenFree": false,
+      "preparationTime": "5 min (réchauffage)",
+      "popularity": 4
+    },
+    {
+      "id": "meal17",
+      "name": "Salade Niçoise",
+      "imageUrl": "/api/placeholder/400/300",
+      "price": "3,50€",
+      "categoryIds": [
+        "cat1",
+        "cat5"
+      ],
+      "description": "Salade traditionnelle composée de tomates, œufs durs, thon, olives et haricots verts. Fraîche et méditerranéenne.",
+      "restaurantId": "10",
+      "ingredients": [
+        "Salade verte",
+        "Tomates",
+        "Œufs durs",
+        "Thon",
+        "Haricots verts",
+        "Olives noires",
+        "Vinaigrette à l'huile d'olive"
+      ],
+      "allergens": [
+        "Œuf",
+        "Poisson"
+      ],
+      "nutritionalInfo": {
+        "Calories": "280 kcal",
+        "Protéines": "18g",
+        "Glucides": "15g",
+        "Lipides": "16g",
+        "Sel": "1.3g"
+      },
+      "isVegetarian": false,
+      "isVegan": false,
+      "isGlutenFree": true,
+      "preparationTime": "8 min",
+      "popularity": 3
+    },
+    {
+      "id": "meal18",
+      "name": "Yaourt Nature",
+      "imageUrl": "/api/placeholder/400/300",
+      "price": "0,80€",
+      "categoryIds": [
+        "cat3",
+        "cat5"
+      ],
+      "description": "Yaourt nature crémeux de 125g, produit localement avec du lait frais.",
+      "restaurantId": "1",
+      "ingredients": [
+        "Lait entier",
+        "Ferments lactiques"
+      ],
+      "allergens": [
+        "Lactose"
+      ],
+      "nutritionalInfo": {
+        "Calories": "70 kcal",
+        "Protéines": "5g",
+        "Glucides": "6g",
+        "dont Sucres": "6g",
+        "Lipides": "3g"
+      },
+      "isVegetarian": true,
+      "isVegan": false,
+      "isGlutenFree": true,
+      "preparationTime": "0 min",
+      "popularity": 3
+    },
+    {
+      "id": "meal19",
+      "name": "Croque-Monsieur",
+      "imageUrl": "/api/placeholder/400/300",
+      "price": "3,10€",
+      "categoryIds": [
+        "cat2"
+      ],
+      "description": "Sandwich chaud garni de jambon et fromage, grillé au four pour un extérieur croustillant et un intérieur fondant.",
+      "restaurantId": "7",
+      "ingredients": [
+        "Pain de mie",
+        "Jambon blanc",
+        "Emmental",
+        "Béchamel légère"
+      ],
+      "allergens": [
+        "Gluten",
+        "Lactose"
+      ],
+      "nutritionalInfo": {
+        "Calories": "350 kcal",
+        "Protéines": "20g",
+        "Glucides": "30g",
+        "Lipides": "18g",
+        "Sel": "1.8g"
+      },
+      "isVegetarian": false,
+      "isVegan": false,
+      "isGlutenFree": false,
+      "preparationTime": "8 min",
+      "popularity": 4
+    },
+    {
+      "id": "meal20",
+      "name": "Tiramisu",
+      "imageUrl": "/api/placeholder/400/300",
+      "price": "2,50€",
+      "categoryIds": [
+        "cat3",
+        "cat6"
+      ],
+      "description": "Dessert italien traditionnel à base de mascarpone, café et biscuits, légèrement saupoudré de cacao.",
+      "restaurantId": "8",
+      "ingredients": [
+        "Mascarpone",
+        "Œufs",
+        "Sucre",
+        "Café",
+        "Biscuits cuillère",
+        "Cacao en poudre"
+      ],
+      "allergens": [
+        "Gluten",
+        "Œuf",
+        "Lactose"
+      ],
+      "nutritionalInfo": {
+        "Calories": "290 kcal",
+        "Protéines": "6g",
+        "Glucides": "25g",
+        "dont Sucres": "18g",
+        "Lipides": "19g"
+      },
+      "isVegetarian": true,
+      "isVegan": false,
+      "isGlutenFree": false,
+      "preparationTime": "0 min (prêt à servir)",
+      "popularity": 5,
+      "inPromotion": true,
+      "promotionPrice": "2,00€"
+    }
+  ],
+  "news": [
+    {
+      "id": "news1",
+      "title": "Menu à 1€ pour tous les étudiants boursiers",
+      "summary": "À partir du 1er mars, tous les étudiants boursiers peuvent bénéficier du repas à 1€ dans nos restaurants universitaires.",
+      "content": "Description détaillée de la mesure et des conditions d'éligibilité...",
+      "date": "27/02/2025",
+      "imageUrl": "https://placehold.co/600x300",
+      "author": "Service Communication CROUS",
+      "category": "Tarifs",
+      "isPublished": true,
+      "publishedAt": "2025-02-27T10:00:00Z"
+    },
+    {
+      "id": "news2",
+      "title": "Nouveaux horaires pour le RU Saint-Charles",
+      "summary": "Le restaurant universitaire Saint-Charles étend ses horaires d'ouverture jusqu'à 21h du lundi au vendredi.",
+      "content": "Détails des nouveaux horaires et des services proposés en soirée...",
+      "date": "25/02/2025",
+      "imageUrl": "https://placehold.co/600x300",
+      "author": "Direction RU Saint-Charles",
+      "category": "Horaires",
+      "isPublished": true,
+      "publishedAt": "2025-02-25T14:30:00Z"
+    }
+  ],
+  "orders": [
+  ]
+}
