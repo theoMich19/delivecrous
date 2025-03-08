@@ -200,6 +200,69 @@ server.get('/meals', (req, res) => {
   res.json(meals);
 });
 
+// Route pour récupérer les favoris d'un utilisateur
+server.get('/users/:userId/favorites', authenticateToken, (req, res) => {
+  try {
+    const user = router.db.get('users').find({ id: req.params.userId }).value();
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+    res.json(user.favorites);
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur lors de la récupération des favoris' });
+  }
+});
+
+// Route pour ajouter un repas aux favoris d'un utilisateur
+server.post('/users/:userId/favorites/:mealId', authenticateToken, (req, res) => {
+  try {
+    const user = router.db.get('users').find({ id: req.params.userId }).value();
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+
+    if (!user.favorites.includes(req.params.mealId)) {
+      router.db
+        .get('users')
+        .find({ id: req.params.userId })
+        .assign({
+          favorites: [...user.favorites, req.params.mealId]
+        })
+        .write();
+    }
+
+    const updatedUser = router.db.get('users').find({ id: req.params.userId }).value();
+    const { password, ...userWithoutPassword } = updatedUser;
+    res.json(userWithoutPassword);
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur lors de l\'ajout aux favoris' });
+  }
+});
+
+// Route pour supprimer un repas des favoris d'un utilisateur
+server.delete('/users/:userId/favorites/:mealId', authenticateToken, (req, res) => {
+  try {
+    const user = router.db.get('users').find({ id: req.params.userId }).value();
+    if (!user) {
+      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+    }
+
+    router.db
+      .get('users')
+      .find({ id: req.params.userId })
+      .assign({
+        favorites: user.favorites.filter(id => id !== req.params.mealId)
+      })
+      .write();
+
+    const updatedUser = router.db.get('users').find({ id: req.params.userId }).value();
+    const { password, ...userWithoutPassword } = updatedUser;
+    res.json(userWithoutPassword);
+  } catch (error) {
+    res.status(500).json({ message: 'Erreur lors de la suppression des favoris' });
+  }
+});
+
 // Utiliser le routeur json-server pour toutes les autres routes
 server.use(router);
 

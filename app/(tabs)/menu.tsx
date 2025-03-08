@@ -13,17 +13,21 @@ import {
 } from 'react-native';
 import { Button, Heading, SubHeading, RegularText, Input } from '@components/common/crous-components';
 import { MenuService } from '@/services/menu.service';
+import { UserService } from '@/services/user.service';
 import { getCategoryIcon } from '@/components/categories/CategoryIcons';
 import { COLORS } from '@/styles/global';
 import Header from '@/components/common/header';
 import { useCart } from '@/contexts/CartContext';
 import { Category, Meal } from '@/models/food.model';
 import { Restaurant } from '@/models/restaurant.model';
+import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '@/contexts/AuthContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function MenuScreen() {
     const { addToCart } = useCart()
+    const { user } = useAuth()
     const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [meals, setMeals] = useState<Meal[]>([]);
@@ -35,10 +39,14 @@ export default function MenuScreen() {
     const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>([]);
     const [mealModalVisible, setMealModalVisible] = useState(false);
     const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
+    const [userFavorites, setUserFavorites] = useState<string[]>([]);
 
     useEffect(() => {
         loadInitialData();
-    }, []);
+        if (user) {
+            loadUserFavorites();
+        }
+    }, [user]);
 
     const loadInitialData = async () => {
         const [restaurantsData, categoriesData, mealsData] = await Promise.all([
@@ -51,6 +59,33 @@ export default function MenuScreen() {
         setMeals(mealsData);
         setFilteredMeals(mealsData);
         setFilteredRestaurants(restaurantsData);
+    };
+
+    const loadUserFavorites = async () => {
+        if (user) {
+            try {
+                const favorites = await UserService.getFavorites(user.id);
+                setUserFavorites(favorites);
+            } catch (error) {
+                console.error('Erreur lors du chargement des favoris:', error);
+            }
+        }
+    };
+
+    const toggleFavorite = async (mealId: string) => {
+        if (!user) return;
+
+        try {
+            if (userFavorites.includes(mealId)) {
+                await UserService.removeFromFavorites(user.id, mealId);
+                setUserFavorites(prev => prev.filter(id => id !== mealId));
+            } else {
+                await UserService.addToFavorites(user.id, mealId);
+                setUserFavorites(prev => [...prev, mealId]);
+            }
+        } catch (error) {
+            console.error('Erreur lors de la modification des favoris:', error);
+        }
     };
 
     useEffect(() => {
@@ -68,11 +103,20 @@ export default function MenuScreen() {
                 filtered = meals;
             }
             
-            setFilteredMeals(filtered);
+            // Tri des plats avec les favoris en haut
+            const sortedMeals = [...filtered].sort((a, b) => {
+                const aIsFavorite = userFavorites.includes(a.id);
+                const bIsFavorite = userFavorites.includes(b.id);
+                if (aIsFavorite && !bIsFavorite) return -1;
+                if (!aIsFavorite && bIsFavorite) return 1;
+                return 0;
+            });
+            
+            setFilteredMeals(sortedMeals);
         };
 
         updateFilteredMeals();
-    }, [selectedRestaurant, selectedCategory]);
+    }, [selectedRestaurant, selectedCategory, userFavorites]);
 
     useEffect(() => {
         if (searchText.trim() === '') {
@@ -125,6 +169,7 @@ export default function MenuScreen() {
 
     const renderMealItem = ({ item }: { item: Meal }) => {
         const restaurant = restaurants.find(r => r.id === item.restaurantId);
+        const isFavorite = userFavorites.includes(item.id);
 
         return (
             <TouchableOpacity
@@ -138,7 +183,17 @@ export default function MenuScreen() {
                     defaultSource={require('@assets/images/default42.png')}
                 />
                 <View style={styles.mealInfo}>
-                    <SubHeading style={styles.mealName}>{item.name}</SubHeading>
+                    <View style={styles.mealHeader}>
+                        <SubHeading style={styles.mealName}>{item.name}</SubHeading>
+                        {isFavorite && (
+                            <Ionicons
+                                name="heart"
+                                size={20}
+                                color={COLORS.accent}
+                                style={styles.favoriteIcon}
+                            />
+                        )}
+                    </View>
                     <RegularText style={styles.mealDescription} numberOfLines={2}>{item.description}</RegularText>
                     <View style={styles.mealBottom}>
                         <Text style={styles.mealPrice}>{item.price}</Text>
@@ -187,142 +242,154 @@ export default function MenuScreen() {
         const mealCategories = categories.filter(category =>
             selectedMeal.categoryIds.includes(category.id)
         );
+        const isFavorite = userFavorites.includes(selectedMeal.id);
 
         return (
             <Modal
                 animationType="slide"
-                transparent={false}
+                transparent={true}
                 visible={mealModalVisible}
                 onRequestClose={() => setMealModalVisible(false)}
             >
-                <SafeAreaView style={styles.mealModalContainer}>
-
-                    <View style={styles.mealModalHeader}>
-                        <TouchableOpacity
-                            style={styles.modalCloseButton}
-                            onPress={() => setMealModalVisible(false)}
-                        >
-                            <Text style={styles.modalCloseText}>Fermer</Text>
-                        </TouchableOpacity>
-                    </View>
-
-                    <ScrollView style={styles.mealModalContent}>
-                        <Image
-                            source={{ uri: selectedMeal.imageUrl }}
-                            style={styles.mealModalImage}
-                            defaultSource={require('@assets/images/default42.png')}
-                        />
-
-                        <View style={styles.mealModalTitleContainer}>
-                            <Heading style={styles.mealModalTitle}>{selectedMeal.name}</Heading>
-                            <Text style={styles.mealModalPrice}>{selectedMeal.price}</Text>
+                <View style={styles.mealModalOverlay}>
+                    <SafeAreaView style={styles.mealModalContainer}>
+                        <View style={styles.mealModalHeader}>
+                            <TouchableOpacity
+                                style={styles.modalCloseButton}
+                                onPress={() => setMealModalVisible(false)}
+                            >
+                                <Text style={styles.modalCloseText}>Fermer</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={styles.favoriteButton}
+                                onPress={() => toggleFavorite(selectedMeal.id)}
+                            >
+                                <Ionicons
+                                    name={isFavorite ? "heart" : "heart-outline"}
+                                    size={28}
+                                    color={isFavorite ? COLORS.accent : COLORS.text}
+                                />
+                            </TouchableOpacity>
                         </View>
 
-                        <View style={styles.mealModalSection}>
-                            <SubHeading style={styles.mealModalSectionTitle}>Description</SubHeading>
-                            <RegularText style={styles.mealModalDescription}>
-                                {selectedMeal.description}
-                            </RegularText>
+                        <ScrollView style={styles.mealModalContent}>
+                            <Image
+                                source={{ uri: selectedMeal.imageUrl }}
+                                style={styles.mealModalImage}
+                                defaultSource={require('@assets/images/default42.png')}
+                            />
 
-                            {selectedMeal.ingredients && (
-                                <View style={styles.mealModalIngredients}>
-                                    <SubHeading style={styles.mealModalSectionTitle}>Ingrédients</SubHeading>
-                                    <View style={styles.ingredientsList}>
-                                        {selectedMeal.ingredients.map((ingredient, index) => (
-                                            <View key={index} style={styles.ingredientItem}>
-                                                <View style={styles.ingredientDot} />
-                                                <RegularText style={styles.ingredientText}>
-                                                    {ingredient}
+                            <View style={styles.mealModalTitleContainer}>
+                                <Heading style={styles.mealModalTitle}>{selectedMeal.name}</Heading>
+                                <Text style={styles.mealModalPrice}>{selectedMeal.price}</Text>
+                            </View>
+
+                            <View style={styles.mealModalSection}>
+                                <SubHeading style={styles.mealModalSectionTitle}>Description</SubHeading>
+                                <RegularText style={styles.mealModalDescription}>
+                                    {selectedMeal.description}
+                                </RegularText>
+
+                                {selectedMeal.ingredients && (
+                                    <View style={styles.mealModalIngredients}>
+                                        <SubHeading style={styles.mealModalSectionTitle}>Ingrédients</SubHeading>
+                                        <View style={styles.ingredientsList}>
+                                            {selectedMeal.ingredients.map((ingredient, index) => (
+                                                <View key={index} style={styles.ingredientItem}>
+                                                    <View style={styles.ingredientDot} />
+                                                    <RegularText style={styles.ingredientText}>
+                                                        {ingredient}
+                                                    </RegularText>
+                                                </View>
+                                            ))}
+                                        </View>
+                                    </View>
+                                )}
+                            </View>
+
+                            {mealRestaurant && (
+                                <View style={styles.mealModalSection}>
+                                    <SubHeading style={styles.mealModalSectionTitle}>Restaurant</SubHeading>
+                                    <TouchableOpacity
+                                        style={styles.mealModalRestaurantCard}
+                                        onPress={() => {
+                                            setMealModalVisible(false);
+                                            setSelectedRestaurant(mealRestaurant);
+                                        }}
+                                    >
+                                        <Image
+                                            source={{ uri: mealRestaurant.imageUrl }}
+                                            style={styles.mealModalRestaurantImage}
+                                            defaultSource={require('@assets/images/default42.png')}
+                                        />
+                                        <View style={styles.mealModalRestaurantInfo}>
+                                            <SubHeading style={styles.modalRestaurantName}>{mealRestaurant.name}</SubHeading>
+                                            <View style={styles.ratingContainer}>
+                                                <View style={styles.ratingBadge}>
+                                                    <RegularText>{mealRestaurant.rating.toFixed(1)}</RegularText>
+                                                </View>
+                                                <RegularText> • {mealRestaurant.timeEstimate}</RegularText>
+                                            </View>
+                                        </View>
+                                    </TouchableOpacity>
+                                </View>
+                            )}
+
+                            {mealCategories.length > 0 && (
+                                <View style={styles.mealModalSection}>
+                                    <SubHeading style={styles.mealModalSectionTitle}>Catégories</SubHeading>
+                                    <View style={styles.mealModalCategories}>
+                                        {mealCategories.map(category => (
+                                            <View key={category.id} style={styles.categoryBadge}>
+                                                <RegularText style={styles.categoryBadgeText}>{category.name}</RegularText>
+                                            </View>
+                                        ))}
+                                    </View>
+                                </View>
+                            )}
+
+                            {selectedMeal.allergens && selectedMeal.allergens.length > 0 && (
+                                <View style={styles.mealModalSection}>
+                                    <SubHeading style={styles.mealModalSectionTitle}>Allergènes</SubHeading>
+                                    <RegularText style={styles.mealModalAllergens}>
+                                        {selectedMeal.allergens.join(', ')}
+                                    </RegularText>
+                                </View>
+                            )}
+
+                            {selectedMeal.nutritionalInfo && (
+                                <View style={styles.mealModalSection}>
+                                    <SubHeading style={styles.mealModalSectionTitle}>
+                                        Informations nutritionnelles
+                                    </SubHeading>
+                                    <View style={styles.nutritionalInfoContainer}>
+                                        {Object.entries(selectedMeal.nutritionalInfo).map(([key, value], index) => (
+                                            <View key={index} style={styles.nutritionalInfoItem}>
+                                                <RegularText style={styles.nutritionalInfoLabel}>
+                                                    {key}:
+                                                </RegularText>
+                                                <RegularText style={styles.nutritionalInfoValue}>
+                                                    {value}
                                                 </RegularText>
                                             </View>
                                         ))}
                                     </View>
                                 </View>
                             )}
-                        </View>
 
-                        {mealRestaurant && (
-                            <View style={styles.mealModalSection}>
-                                <SubHeading style={styles.mealModalSectionTitle}>Restaurant</SubHeading>
-                                <TouchableOpacity
-                                    style={styles.mealModalRestaurantCard}
-                                    onPress={() => {
-                                        setMealModalVisible(false);
-                                        setSelectedRestaurant(mealRestaurant);
-                                    }}
-                                >
-                                    <Image
-                                        source={{ uri: mealRestaurant.imageUrl }}
-                                        style={styles.mealModalRestaurantImage}
-                                        defaultSource={require('@assets/images/default42.png')}
-                                    />
-                                    <View style={styles.mealModalRestaurantInfo}>
-                                        <SubHeading style={styles.modalRestaurantName}>{mealRestaurant.name}</SubHeading>
-                                        <View style={styles.ratingContainer}>
-                                            <View style={styles.ratingBadge}>
-                                                <RegularText>{mealRestaurant.rating.toFixed(1)}</RegularText>
-                                            </View>
-                                            <RegularText> • {mealRestaurant.timeEstimate}</RegularText>
-                                        </View>
-                                    </View>
-                                </TouchableOpacity>
-                            </View>
-                        )}
-
-                        {mealCategories.length > 0 && (
-                            <View style={styles.mealModalSection}>
-                                <SubHeading style={styles.mealModalSectionTitle}>Catégories</SubHeading>
-                                <View style={styles.mealModalCategories}>
-                                    {mealCategories.map(category => (
-                                        <View key={category.id} style={styles.categoryBadge}>
-                                            <RegularText style={styles.categoryBadgeText}>{category.name}</RegularText>
-                                        </View>
-                                    ))}
-                                </View>
-                            </View>
-                        )}
-
-                        {selectedMeal.allergens && selectedMeal.allergens.length > 0 && (
-                            <View style={styles.mealModalSection}>
-                                <SubHeading style={styles.mealModalSectionTitle}>Allergènes</SubHeading>
-                                <RegularText style={styles.mealModalAllergens}>
-                                    {selectedMeal.allergens.join(', ')}
-                                </RegularText>
-                            </View>
-                        )}
-
-                        {selectedMeal.nutritionalInfo && (
-                            <View style={styles.mealModalSection}>
-                                <SubHeading style={styles.mealModalSectionTitle}>
-                                    Informations nutritionnelles
-                                </SubHeading>
-                                <View style={styles.nutritionalInfoContainer}>
-                                    {Object.entries(selectedMeal.nutritionalInfo).map(([key, value], index) => (
-                                        <View key={index} style={styles.nutritionalInfoItem}>
-                                            <RegularText style={styles.nutritionalInfoLabel}>
-                                                {key}:
-                                            </RegularText>
-                                            <RegularText style={styles.nutritionalInfoValue}>
-                                                {value}
-                                            </RegularText>
-                                        </View>
-                                    ))}
-                                </View>
-                            </View>
-                        )}
-
-                        <Button
-                            title="Commander ce plat"
-                            onPress={() => {
-                                const restaurantName = mealRestaurant ? mealRestaurant.name : "Restaurant inconnu";
-                                addToCart(selectedMeal, restaurantName);
-                                alert(`${selectedMeal.name} ajouté au panier`);
-                                setMealModalVisible(false);
-                            }}
-                            style={styles.orderButton}
-                        />
-                    </ScrollView>
-                </SafeAreaView>
+                            <Button
+                                title="Commander ce plat"
+                                onPress={() => {
+                                    const restaurantName = mealRestaurant ? mealRestaurant.name : "Restaurant inconnu";
+                                    addToCart(selectedMeal, restaurantName);
+                                    alert(`${selectedMeal.name} ajouté au panier`);
+                                    setMealModalVisible(false);
+                                }}
+                                style={styles.orderButton}
+                            />
+                        </ScrollView>
+                    </SafeAreaView>
+                </View>
             </Modal>
         );
     };
@@ -450,7 +517,6 @@ export default function MenuScreen() {
                     </ScrollView>
                 </SafeAreaView>
             </Modal>
-
 
             {renderMealDetailsModal()}
         </SafeAreaView>
@@ -599,8 +665,19 @@ const styles = StyleSheet.create({
         padding: 12,
         justifyContent: 'space-between',
     },
+    mealHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 4,
+    },
     mealName: {
         fontSize: 16,
+        flex: 1,
+        marginRight: 8,
+    },
+    favoriteIcon: {
+        marginLeft: 'auto',
     },
     mealDescription: {
         fontSize: 13,
@@ -721,19 +798,23 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: COLORS.textSecondary,
     },
+    mealModalOverlay: {
+        flex: 1,
+        backgroundColor: COLORS.background,
+    },
     mealModalContainer: {
         flex: 1,
         backgroundColor: COLORS.background,
     },
     mealModalHeader: {
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: COLORS.primary,
         paddingVertical: 12,
         paddingHorizontal: 15,
-        position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 10,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        borderBottomWidth: 1,
+        borderBottomColor: COLORS.border,
     },
     mealModalContent: {
         flex: 1,
@@ -852,5 +933,8 @@ const styles = StyleSheet.create({
         margin: 15,
         marginTop: 5,
         marginBottom: 30,
-    }
+    },
+    favoriteButton: {
+        padding: 8,
+    },
 });

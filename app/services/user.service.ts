@@ -108,4 +108,60 @@ export const UserService = {
       throw error;
     }
   },
+
+  async addToFavorites(userId: string, mealId: string): Promise<AuthResponse['user']> {
+    try {
+      const headers = await this.getHeaders();
+      const response = await fetch(`${API_URL}/users/${userId}/favorites/${mealId}`, {
+        method: 'POST',
+        headers,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Erreur lors de l\'ajout aux favoris');
+      }
+
+      return response.json();
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async removeFromFavorites(userId: string, mealId: string): Promise<AuthResponse['user']> {
+    try {
+      const headers = await this.getHeaders();
+      const response = await fetch(`${API_URL}/users/${userId}/favorites/${mealId}`, {
+        method: 'DELETE',
+        headers,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Erreur lors de la suppression des favoris');
+      }
+
+      return response.json();
+    } catch (error) {
+      throw error;
+    }
+  },
+
+  async getFavorites(userId: string): Promise<string[]> {
+    try {
+      const headers = await this.getHeaders();
+      const response = await fetch(`${API_URL}/users/${userId}/favorites`, {
+        headers,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || 'Erreur lors de la récupération des favoris');
+      }
+
+      return response.json();
+    } catch (error) {
+      throw error;
+    }
+  },
 }; 
