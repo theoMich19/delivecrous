@@ -26,26 +26,18 @@
       "address": "101 rue de la republique 69150"
     },
     {
-      "id": "1741436146759",
+      "id": "1741445263142",
       "email": "theo.michellon@gmail.com",
-      "password": "$2a$10$z/22mBYh7ecjd2PN0XNQzu9esEhN.4FsVcWbyl9QOECyBKAbo2cXS",
+      "password": "$2a$10$oIB4abyKYL0m58IeRIfyyOFHdHWsNo5uKVP.TMy0yq68YWZdhmYgy",
       "name": "Theo Michellon",
       "phone": "",
       "address": "",
-      "favorites": [],
+      "favorites": [
+        "meal1"
+      ],
       "orders": [
-        "1741444188932"
+        "1741445287651"
       ]
-    },
-    {
-      "id": "1741436198633",
-      "email": "test.tedt@gmaol.com",
-      "password": "$2a$10$Gc4Joq.pF7yDwoBPGtdiPe2qzAVC9vPH/mSMQapIXSxwngY8C3Jwi",
-      "name": "Test Test",
-      "phone": "0645124568",
-      "address": "Tester avignon",
-      "favorites": [],
-      "orders": []
     }
   ],
   "restaurants": [
@@ -1048,80 +1040,5 @@
     }
   ],
   "orders": [
-    {
-      "restaurantId": "1",
-      "meals": [
-        {
-          "mealId": "meal1",
-          "quantity": 1
-        }
-      ],
-      "totalPrice": 3.3,
-      "deliveryAddress": {
-        "street": "Test",
-        "postalCode": "13566",
-        "city": "Test",
-        "buildingInfo": "Bâtiment b",
-        "accessCode": "",
-        "instructions": ""
-      },
-      "id": 1
-    },
-    {
-      "restaurantId": "1",
-      "meals": [
-        {
-          "mealId": "meal1",
-          "quantity": 1
-        },
-        {
-          "mealId": "meal18",
-          "quantity": 1
-        }
-      ],
-      "totalPrice": 4.1,
-      "deliveryAddress": {
-        "street": "Test",
-        "postalCode": "130009",
-        "city": "Marseille",
-        "buildingInfo": "",
-        "accessCode": "",
-        "instructions": ""
-      },
-      "id": 2
-    },
-    {
-      "restaurantId": "1",
-      "meals": [
-        {
-          "mealId": "meal1",
-          "quantity": 1
-        }
-      ],
-      "totalPrice": 3.3,
-      "deliveryAddress": {
-        "street": "Test",
-        "postalCode": "123456",
-        "city": "Test",
-        "buildingInfo": "",
-        "accessCode": "",
-        "instructions": ""
-      },
-      "id": 3
-    },
-    {
-      "id": "1741444188932",
-      "userId": "1741436146759",
-      "restaurantId": "1",
-      "meals": [
-        {
-          "mealId": "meal1",
-          "quantity": 1
-        }
-      ],
-      "totalPrice": 3.3,
-      "status": "canceled",
-      "createdAt": "2025-03-08T14:29:48.932Z"
-    }
   ]
 }
