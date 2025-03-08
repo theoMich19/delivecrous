@@ -1,7 +1,7 @@
-import { API_CONFIG } from '@/config/api.config';
-import { Category } from '@/models/category.model';
-import { Meal } from '@/models/meal.model';
-import { Restaurant } from '@/models/restaurant.model';
+import { API_CONFIG } from "@/config/api.config";
+import { Category } from "@/models/category.model";
+import { Meal } from "@/models/meal.model";
+import { Restaurant } from "@/models/restaurant.model";
 
 const API_URL = API_CONFIG.BASE_URL;
 
@@ -10,11 +10,11 @@ export const MenuService = {
     try {
       const response = await fetch(`${API_URL}/restaurants`);
       if (!response.ok) {
-        throw new Error('Erreur lors de la récupération des restaurants');
+        throw new Error("Erreur lors de la récupération des restaurants");
       }
       return response.json();
     } catch (error) {
-      console.error('Erreur getRestaurants:', error);
+      console.error("Erreur getRestaurants:", error);
       throw error;
     }
   },
@@ -23,11 +23,11 @@ export const MenuService = {
     try {
       const response = await fetch(`${API_URL}/categories`);
       if (!response.ok) {
-        throw new Error('Erreur lors de la récupération des catégories');
+        throw new Error("Erreur lors de la récupération des catégories");
       }
       return response.json();
     } catch (error) {
-      console.error('Erreur getCategories:', error);
+      console.error("Erreur getCategories:", error);
       throw error;
     }
   },
@@ -36,38 +36,59 @@ export const MenuService = {
     try {
       const response = await fetch(`${API_URL}/meals`);
       if (!response.ok) {
-        throw new Error('Erreur lors de la récupération des plats');
+        throw new Error("Erreur lors de la récupération des plats");
       }
       return response.json();
     } catch (error) {
-      console.error('Erreur getMeals:', error);
+      console.error("Erreur getMeals:", error);
       throw error;
     }
   },
 
   async getMealsByRestaurant(restaurantId: string): Promise<Meal[]> {
     try {
-      const response = await fetch(`${API_URL}/meals?restaurantId=${restaurantId}`);
+      const response = await fetch(
+        `${API_URL}/meals?restaurantId=${restaurantId}`
+      );
       if (!response.ok) {
-        throw new Error('Erreur lors de la récupération des plats du restaurant');
+        throw new Error(
+          "Erreur lors de la récupération des plats du restaurant"
+        );
       }
       return response.json();
     } catch (error) {
-      console.error('Erreur getMealsByRestaurant:', error);
+      console.error("Erreur getMealsByRestaurant:", error);
       throw error;
     }
   },
 
   async getMealsByCategory(categoryId: string): Promise<Meal[]> {
     try {
-      const response = await fetch(`${API_URL}/meals?categoryIds_like=${categoryId}`);
+      const response = await fetch(
+        `${API_URL}/meals?categoryIds_like=${categoryId}`
+      );
       if (!response.ok) {
-        throw new Error('Erreur lors de la récupération des plats par catégorie');
+        throw new Error(
+          "Erreur lors de la récupération des plats par catégorie"
+        );
       }
       return response.json();
     } catch (error) {
-      console.error('Erreur getMealsByCategory:', error);
+      console.error("Erreur getMealsByCategory:", error);
       throw error;
     }
-  }
-}; 
+  },
+
+  async getRestaurantById(restaurantId: string): Promise<Restaurant> {
+    try {
+      const response = await fetch(`${API_URL}/restaurants/${restaurantId}`);
+      if (!response.ok) {
+        throw new Error("Erreur lors de la récupération du restaurant");
+      }
+      return response.json();
+    } catch (error) {
+      console.error("Erreur getRestaurantById:", error);
+      throw error;
+    }
+  },
+};

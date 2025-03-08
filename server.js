@@ -1,4 +1,4 @@
-const jsonServer = require('json-server');
+const jsonServer = require("json-server");
 const server = jsonServer.create();
 const router = jsonServer.router(process.env.NODE_ENV === 'test' ? '__tests__/db.test.json' : 'db.json');
 const middlewares = jsonServer.defaults();
@@ -7,7 +7,7 @@ const jwt = require('jsonwebtoken');
 const fs = require('fs');
 const path = require('path');
 
-const SECRET_KEY = 'votre_clé_secrète_ici';
+const SECRET_KEY = "votre_clé_secrète_ici";
 
 server.use(middlewares);
 server.use(jsonServer.bodyParser);
@@ -65,26 +65,26 @@ const resetTestDb = () => {
 
 // Middleware pour vérifier le token JWT
 const authenticateToken = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
-  const token = authHeader && authHeader.split(' ')[1];
+  const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
 
-  if (!token) return res.status(401).json({ message: 'Token manquant' });
+  if (!token) return res.status(401).json({ message: "Token manquant" });
 
   jwt.verify(token, SECRET_KEY, (err, user) => {
-    if (err) return res.status(403).json({ message: 'Token invalide' });
+    if (err) return res.status(403).json({ message: "Token invalide" });
     req.user = user;
     next();
   });
 };
 
 // Route d'inscription
-server.post('/register', async (req, res) => {
+server.post("/register", async (req, res) => {
   const { email, password, name } = req.body;
 
   // Vérifier si l'utilisateur existe déjà
-  const existingUser = router.db.get('users').find({ email }).value();
+  const existingUser = router.db.get("users").find({ email }).value();
   if (existingUser) {
-    return res.status(400).json({ message: 'Cet email est déjà utilisé' });
+    return res.status(400).json({ message: "Cet email est déjà utilisé" });
   }
 
   // Hasher le mot de passe
@@ -96,38 +96,38 @@ server.post('/register', async (req, res) => {
     email,
     password: hashedPassword,
     name,
-    phone: '',
-    address: '',
+    phone: "",
+    address: "",
     favorites: [],
-    orders: []
+    orders: [],
   };
 
   // Ajouter l'utilisateur à la base de données
-  router.db.get('users').push(newUser).write();
+  router.db.get("users").push(newUser).write();
 
   // Générer le token JWT
   const token = jwt.sign({ id: newUser.id, email: newUser.email }, SECRET_KEY);
 
-  res.status(201).json({ 
+  res.status(201).json({
     token,
-    user: { ...newUser, password: undefined }
+    user: { ...newUser, password: undefined },
   });
 });
 
 // Route de connexion
-server.post('/login', async (req, res) => {
+server.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
   // Trouver l'utilisateur
-  const user = router.db.get('users').find({ email }).value();
+  const user = router.db.get("users").find({ email }).value();
   if (!user) {
-    return res.status(400).json({ message: 'Email ou mot de passe incorrect' });
+    return res.status(400).json({ message: "Email ou mot de passe incorrect" });
   }
 
   // Vérifier le mot de passe
   const validPassword = await bcrypt.compare(password, user.password);
   if (!validPassword) {
-    return res.status(400).json({ message: 'Email ou mot de passe incorrect' });
+    return res.status(400).json({ message: "Email ou mot de passe incorrect" });
   }
 
   // Générer le token JWT
@@ -142,61 +142,57 @@ server.post('/login', async (req, res) => {
       phone: user.phone,
       address: user.address,
       favorites: user.favorites,
-      orders: user.orders
-    }
+      orders: user.orders,
+    },
   });
 });
 
 // Route pour mettre à jour le profil utilisateur
-server.patch('/users/:id', authenticateToken, async (req, res) => {
+server.patch("/users/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
 
   // Vérifier que l'utilisateur modifie son propre profil
   if (id !== req.user.id) {
-    return res.status(403).json({ message: 'Non autorisé' });
+    return res.status(403).json({ message: "Non autorisé" });
   }
 
   try {
     // Récupérer l'utilisateur actuel
-    const user = router.db.get('users').find({ id }).value();
+    const user = router.db.get("users").find({ id }).value();
     if (!user) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
     }
 
     // Mettre à jour uniquement les champs autorisés
-    const allowedUpdates = ['phone', 'address'];
+    const allowedUpdates = ["phone", "address"];
     const filteredUpdates = Object.keys(updates)
-      .filter(key => allowedUpdates.includes(key))
+      .filter((key) => allowedUpdates.includes(key))
       .reduce((obj, key) => {
         obj[key] = updates[key];
         return obj;
       }, {});
 
     // Appliquer les modifications
-    router.db
-      .get('users')
-      .find({ id })
-      .assign(filteredUpdates)
-      .write();
+    router.db.get("users").find({ id }).assign(filteredUpdates).write();
 
     // Retourner l'utilisateur mis à jour (sans le mot de passe)
-    const updatedUser = router.db.get('users').find({ id }).value();
+    const updatedUser = router.db.get("users").find({ id }).value();
     const { password, ...userWithoutPassword } = updatedUser;
 
     res.json(userWithoutPassword);
   } catch (error) {
-    res.status(400).json({ message: 'Erreur lors de la mise à jour' });
+    res.status(400).json({ message: "Erreur lors de la mise à jour" });
   }
 });
 
 // Appliquer l'authentification aux routes protégées
-server.use('/users', authenticateToken);
-server.use('/orders', authenticateToken);
+server.use("/users", authenticateToken);
+server.use("/orders", authenticateToken);
 
 // Route pour récupérer tous les restaurants
-server.get('/restaurants', (req, res) => {
-  const restaurants = router.db.get('restaurants').value();
+server.get("/restaurants", (req, res) => {
+  const restaurants = router.db.get("restaurants").value();
   res.json(restaurants);
 });
 
@@ -223,31 +219,59 @@ server.get('/restaurants/city/:city', (req, res) => {
 });
 
 // Route pour récupérer un restaurant spécifique
-server.get('/restaurants/:id', (req, res) => {
-  const restaurant = router.db.get('restaurants').find({ id: req.params.id }).value();
+server.get("/restaurants/:id", (req, res) => {
+  const restaurant = router.db
+    .get("restaurants")
+    .find({ id: req.params.id })
+    .value();
   if (!restaurant) {
-    return res.status(404).json({ message: 'Restaurant non trouvé' });
+    return res.status(404).json({ message: "Restaurant non trouvé" });
   }
   res.json(restaurant);
 });
 
 // Route pour récupérer les actualités
-server.get('/news', (req, res) => {
-  const news = router.db.get('news').value();
+server.get("/news", (req, res) => {
+  const news = router.db.get("news").value();
   res.json(news);
 });
 
+// Route pour récupérer les restaurants par ville
+server.get("/restaurants/city/:city", (req, res) => {
+  const restaurants = router.db
+    .get("restaurants")
+    .filter({ city: req.params.city })
+    .value();
+  res.json(restaurants);
+});
+
+// Route pour rechercher des restaurants
+server.get("/restaurants/search", (req, res) => {
+  const { query } = req.query;
+  const restaurants = router.db
+    .get("restaurants")
+    .filter(
+      (restaurant) =>
+        restaurant.name.toLowerCase().includes(query.toLowerCase()) ||
+        restaurant.tags.some((tag) =>
+          tag.toLowerCase().includes(query.toLowerCase())
+        )
+    )
+    .value();
+  res.json(restaurants);
+});
+
 // Route pour obtenir les plats par restaurant
-server.get('/meals', (req, res) => {
+server.get("/meals", (req, res) => {
   const { restaurantId, categoryIds_like } = req.query;
-  let meals = router.db.get('meals').value();
+  let meals = router.db.get("meals").value();
 
   if (restaurantId) {
-    meals = meals.filter(meal => meal.restaurantId === restaurantId);
+    meals = meals.filter((meal) => meal.restaurantId === restaurantId);
   }
 
   if (categoryIds_like) {
-    meals = meals.filter(meal => meal.categoryIds.includes(categoryIds_like));
+    meals = meals.filter((meal) => meal.categoryIds.includes(categoryIds_like));
   }
 
   res.json(meals);
@@ -313,6 +337,169 @@ server.delete('/users/:userId/favorites/:mealId', authenticateToken, (req, res) 
     res.json(userWithoutPassword);
   } catch (error) {
     res.status(500).json({ message: 'Erreur lors de la suppression des favoris' });
+  }
+});
+
+// Route pour créer une nouvelle commande
+server.post("/orders", authenticateToken, (req, res) => {
+  const { restaurantId, meals, totalPrice, deliveryAddress } = req.body;
+  const userId = req.user.id;
+
+  // Vérifier que les données requises sont présentes
+  if (!meals || !meals.length || !restaurantId || !totalPrice) {
+    return res.status(400).json({ message: "Données de commande incomplètes" });
+  }
+
+  try {
+    // Créer la nouvelle commande
+    const newOrder = {
+      id: Date.now().toString(),
+      userId,
+      restaurantId,
+      meals,
+      totalPrice,
+      status: "pending",
+      createdAt: new Date().toISOString(),
+    };
+
+    // Ajouter la commande à la base de données
+    router.db.get("orders").push(newOrder).write();
+
+    // Sauvegarder l'adresse de livraison dans une collection séparée
+    if (deliveryAddress) {
+      const deliveryInfo = {
+        id: Date.now().toString() + "-delivery",
+        orderId: newOrder.id,
+        userId,
+        ...deliveryAddress,
+      };
+
+      router.db.get("deliveryAddresses").push(deliveryInfo).write();
+    }
+
+    // Ajouter l'ID de la commande à la liste des commandes de l'utilisateur si nécessaire
+    const user = router.db.get("users").find({ id: userId }).value();
+    if (!user.orders) {
+      router.db
+        .get("users")
+        .find({ id: userId })
+        .assign({ orders: [newOrder.id] })
+        .write();
+    } else {
+      router.db
+        .get("users")
+        .find({ id: userId })
+        .update("orders", (orders) => [...orders, newOrder.id])
+        .write();
+    }
+
+    res.status(201).json(newOrder);
+  } catch (error) {
+    console.error("Erreur lors de la création de la commande:", error);
+    res
+      .status(500)
+      .json({ message: "Erreur serveur lors de la création de la commande" });
+  }
+});
+
+// Route pour récupérer toutes les commandes d'un utilisateur
+server.get("/orders", authenticateToken, (req, res) => {
+  const userId = req.user.id;
+
+  try {
+    // Récupérer toutes les commandes de l'utilisateur
+    const orders = router.db.get("orders").filter({ userId }).value();
+
+    res.json(orders);
+  } catch (error) {
+    console.error("Erreur lors de la récupération des commandes:", error);
+    res
+      .status(500)
+      .json({
+        message: "Erreur serveur lors de la récupération des commandes",
+      });
+  }
+});
+
+// Route pour récupérer une commande spécifique
+server.get("/orders/:id", authenticateToken, (req, res) => {
+  const orderId = req.params.id;
+  const userId = req.user.id;
+
+  try {
+    // Récupérer la commande
+    const order = router.db.get("orders").find({ id: orderId }).value();
+
+    // Vérifier que la commande existe et appartient à l'utilisateur
+    if (!order) {
+      return res.status(404).json({ message: "Commande non trouvée" });
+    }
+
+    if (order.userId !== userId) {
+      return res.status(403).json({ message: "Non autorisé" });
+    }
+
+    // Récupérer l'adresse de livraison associée
+    const deliveryAddress = router.db
+      .get("deliveryAddresses")
+      .find({ orderId })
+      .value();
+
+    res.json({ ...order, deliveryAddress });
+  } catch (error) {
+    console.error("Erreur lors de la récupération de la commande:", error);
+    res
+      .status(500)
+      .json({
+        message: "Erreur serveur lors de la récupération de la commande",
+      });
+  }
+});
+
+// Route pour mettre à jour le statut d'une commande
+server.patch("/orders/:id/status", authenticateToken, (req, res) => {
+  const orderId = req.params.id;
+  const { status } = req.body;
+  const userId = req.user.id;
+
+  if (!["delivered", "pending", "preparing", "canceled"].includes(status)) {
+    return res.status(400).json({ message: "Statut invalide" });
+  }
+
+  try {
+    // Vérifier que la commande existe et appartient à l'utilisateur (ou est un admin)
+    const order = router.db.get("orders").find({ id: orderId }).value();
+
+    if (!order) {
+      return res.status(404).json({ message: "Commande non trouvée" });
+    }
+
+    if (order.userId !== userId) {
+      const user = router.db.get("users").find({ id: userId }).value();
+      // Vérifier si l'utilisateur a le rôle admin (ajustez selon votre logique d'autorisation)
+      if (!user || user.role !== "admin") {
+        return res.status(403).json({ message: "Non autorisé" });
+      }
+    }
+
+    // Mettre à jour le statut de la commande
+    router.db.get("orders").find({ id: orderId }).assign({ status }).write();
+
+    // Récupérer la commande mise à jour
+    const updatedOrder = router.db.get("orders").find({ id: orderId }).value();
+
+    res.json(updatedOrder);
+  } catch (error) {
+    console.error(
+      "Erreur lors de la mise à jour du statut de la commande:",
+      error
+    );
+    res
+      .status(500)
+      .json({
+        message:
+          "Erreur serveur lors de la mise à jour du statut de la commande",
+      });
   }
 });
 

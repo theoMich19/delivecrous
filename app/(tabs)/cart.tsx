@@ -10,20 +10,26 @@ import {
     StatusBar,
     Alert,
     KeyboardAvoidingView,
-    Platform
+    Platform,
+    ActivityIndicator
 } from 'react-native';
 import { Button, Heading, SubHeading, RegularText, Input } from '@components/common/crous-components';
 import { COLORS } from '@/styles/global';
 import { useRouter } from 'expo-router';
 import { Feather } from '@expo/vector-icons';
-import { useCart } from '@/contexts/CartContext';
+import { useCart, CartItem } from '@/contexts/CartContext';
 import Stepper from '@/components/order/stepper/stepper';
+import { OrderService } from '@/services/cart.service';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useAuth } from '@/contexts/AuthContext';
+import { DeliveryAddress, OrderItem } from '@/models/order.model';
 
 const CHECKOUT_STEPS = ["Panier", "Livraison"];
 
 export default function CartScreen(): JSX.Element {
     const router = useRouter();
     const { cartItems, totalPrice, removeFromCart, increaseQuantity, decreaseQuantity, clearCart } = useCart();
+    const { user } = useAuth();
     const [currentStep, setCurrentStep] = useState(0);
     const [address, setAddress] = useState('');
     const [city, setCity] = useState('');
@@ -31,6 +37,23 @@ export default function CartScreen(): JSX.Element {
     const [buildingInfo, setBuildingInfo] = useState('');
     const [accessCode, setAccessCode] = useState('');
     const [deliveryInstructions, setDeliveryInstructions] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    // Utiliser les informations d'adresse de l'utilisateur si disponibles
+    React.useEffect(() => {
+        if (user && user.address) {
+            try {
+                const addressParts = user.address.split(',');
+                if (addressParts.length >= 3) {
+                    setAddress(addressParts[0].trim());
+                    setPostalCode(addressParts[1].trim());
+                    setCity(addressParts[2].trim());
+                }
+            } catch (error) {
+                console.error("Erreur lors du parsing de l'adresse:", error);
+            }
+        }
+    }, [user]);
 
     const handleNextStep = () => {
         if (currentStep === 0) {
@@ -57,12 +80,15 @@ export default function CartScreen(): JSX.Element {
     const resetOrder = () => {
         clearCart();
 
-        setAddress('');
-        setCity('');
-        setPostalCode('');
-        setBuildingInfo('');
-        setAccessCode('');
-        setDeliveryInstructions('');
+        // On ne réinitialise pas les champs d'adresse si l'utilisateur est connecté
+        if (!user) {
+            setAddress('');
+            setCity('');
+            setPostalCode('');
+            setBuildingInfo('');
+            setAccessCode('');
+            setDeliveryInstructions('');
+        }
 
         setCurrentStep(0);
     }
@@ -78,27 +104,95 @@ export default function CartScreen(): JSX.Element {
                 },
                 {
                     text: "Commander",
-                    onPress: () => {
-                        Alert.alert(
-                            "Commande confirmée",
-                            "Votre commande a été placée avec succès !",
-                            [
-                                {
-                                    text: "OK",
-                                    onPress: () => {
-                                        resetOrder()
-                                        router.push("/home");
-                                    }
-                                }
-                            ]
-                        );
-                    }
+                    onPress: submitOrder
                 }
             ]
         );
     };
 
-    const renderCartItem = (item: any) => (
+    const submitOrder = async () => {
+        try {
+            setIsLoading(true);
+
+
+            // Vérifier si le panier contient des articles d'un seul restaurant
+            const restaurantIds = new Set(cartItems.map(item => item.restaurantId));
+            if (restaurantIds.size > 1) {
+                Alert.alert(
+                    "Commande impossible",
+                    "Votre panier contient des articles de différents restaurants. Veuillez commander auprès d'un seul restaurant à la fois."
+                );
+                setIsLoading(false);
+                return;
+            }
+
+            if (cartItems.length === 0 || !cartItems[0].restaurantId) {
+                Alert.alert(
+                    "Erreur",
+                    "Impossible de déterminer le restaurant. Veuillez réessayer."
+                );
+                setIsLoading(false);
+                return;
+            }
+
+            // Préparer les données de l'adresse de livraison
+            const deliveryAddress: DeliveryAddress = {
+                street: address,
+                postalCode,
+                city,
+                buildingInfo,
+                accessCode,
+                instructions: deliveryInstructions
+            };
+
+            // Préparer les données des articles
+            const meals: OrderItem[] = cartItems.map(item => ({
+                mealId: item.id,
+                quantity: item.quantity
+            }));
+
+            // Calculer le prix total (enlever le symbole € et convertir en nombre)
+            const totalPriceValue = parseFloat(totalPrice.replace('€', '').replace(',', '.'));
+
+            // Créer l'objet de commande
+            const orderData = {
+                restaurantId: cartItems[0].restaurantId,
+                meals,
+                totalPrice: totalPriceValue,
+                deliveryAddress
+            };
+
+            // Envoyer la commande à l'API
+            const response = await OrderService.createOrder(orderData);
+
+            // Réinitialiser le panier et les champs
+            resetOrder();
+
+            // Afficher un message de succès
+            Alert.alert(
+                "Commande confirmée",
+                "Votre commande a été placée avec succès !",
+                [
+                    {
+                        text: "OK",
+                        onPress: () => {
+                            router.push("/home");
+                        }
+                    }
+                ]
+            );
+        } catch (error) {
+            console.error("Erreur lors de la soumission de la commande:", error);
+            Alert.alert(
+                "Erreur",
+                "Une erreur est survenue lors de la création de votre commande. Veuillez réessayer."
+            );
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const renderCartItem = (item: CartItem) => (
         <View key={item.id} style={styles.cartItem}>
             <Image
                 source={{ uri: item.imageUrl }}
@@ -262,13 +356,23 @@ export default function CartScreen(): JSX.Element {
                                 onPress={handlePreviousStep}
                                 variant="secondary"
                                 style={styles.backButton}
+                                disabled={isLoading}
                             />
                             <Button
-                                title="Commander"
+                                title={isLoading ? "Traitement..." : "Commander"}
                                 onPress={handleNextStep}
                                 style={styles.confirmButton}
+                                disabled={isLoading}
                             />
                         </View>
+
+                        {isLoading && (
+                            <ActivityIndicator
+                                size="large"
+                                color={COLORS.primary}
+                                style={styles.loader}
+                            />
+                        )}
                     </View>
                 </KeyboardAvoidingView>
             );
@@ -481,5 +585,8 @@ const styles = StyleSheet.create({
     },
     confirmButton: {
         flex: 1,
+    },
+    loader: {
+        marginTop: 15
     }
 });

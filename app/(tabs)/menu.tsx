@@ -91,7 +91,7 @@ export default function MenuScreen() {
     useEffect(() => {
         const updateFilteredMeals = async () => {
             let filtered: Meal[];
-            
+
             if (selectedRestaurant && selectedCategory) {
                 const restaurantMeals = await MenuService.getMealsByRestaurant(selectedRestaurant.id);
                 filtered = restaurantMeals.filter(meal => meal.categoryIds.includes(selectedCategory));
