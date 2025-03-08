@@ -1,14 +1,67 @@
 const jsonServer = require('json-server');
 const server = jsonServer.create();
-const router = jsonServer.router('db.json');
+const router = jsonServer.router(process.env.NODE_ENV === 'test' ? '__tests__/db.test.json' : 'db.json');
 const middlewares = jsonServer.defaults();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const fs = require('fs');
+const path = require('path');
 
 const SECRET_KEY = 'votre_clé_secrète_ici';
 
 server.use(middlewares);
 server.use(jsonServer.bodyParser);
+
+// Fonction pour réinitialiser la base de données de test
+const resetTestDb = () => {
+    if (process.env.NODE_ENV === 'test') {
+        const initialData = {
+            users: [],
+            restaurants: [
+                {
+                    id: "1",
+                    name: "Test Restaurant",
+                    city: "Paris",
+                    rating: 4.5,
+                    timeEstimate: "20-30 min",
+                    tags: ["Test", "Restaurant"],
+                    imageUrl: "https://example.com/image.jpg"
+                }
+            ],
+            meals: [
+                {
+                    id: "1",
+                    name: "Test Meal",
+                    description: "A test meal",
+                    price: "10.99€",
+                    restaurantId: "1",
+                    categoryIds: ["category1"],
+                    imageUrl: "https://example.com/meal.jpg"
+                }
+            ],
+            news: [
+                {
+                    id: "1",
+                    title: "Test News",
+                    content: "Test content"
+                }
+            ]
+        };
+
+        // Écrire les données dans le fichier
+        fs.writeFileSync(
+            path.join(__dirname, '__tests__/db.test.json'),
+            JSON.stringify(initialData, null, 2)
+        );
+
+        // Réinitialiser l'état de la base de données
+        router.db.setState(initialData);
+        router.db.write();
+
+        return initialData;
+    }
+    return null;
+};
 
 // Middleware pour vérifier le token JWT
 const authenticateToken = (req, res, next) => {
@@ -147,6 +200,28 @@ server.get('/restaurants', (req, res) => {
   res.json(restaurants);
 });
 
+// Route pour rechercher des restaurants
+server.get('/restaurants/search', (req, res) => {
+  const { query } = req.query;
+  const restaurants = router.db
+    .get('restaurants')
+    .filter(restaurant => 
+      restaurant.name.toLowerCase().includes(query.toLowerCase()) ||
+      restaurant.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()))
+    )
+    .value();
+  res.json(restaurants);
+});
+
+// Route pour récupérer les restaurants par ville
+server.get('/restaurants/city/:city', (req, res) => {
+  const restaurants = router.db
+    .get('restaurants')
+    .filter({ city: req.params.city })
+    .value();
+  res.json(restaurants);
+});
+
 // Route pour récupérer un restaurant spécifique
 server.get('/restaurants/:id', (req, res) => {
   const restaurant = router.db.get('restaurants').find({ id: req.params.id }).value();
@@ -160,28 +235,6 @@ server.get('/restaurants/:id', (req, res) => {
 server.get('/news', (req, res) => {
   const news = router.db.get('news').value();
   res.json(news);
-});
-
-// Route pour récupérer les restaurants par ville
-server.get('/restaurants/city/:city', (req, res) => {
-  const restaurants = router.db
-    .get('restaurants')
-    .filter({ city: req.params.city })
-    .value();
-  res.json(restaurants);
-});
-
-// Route pour rechercher des restaurants
-server.get('/restaurants/search', (req, res) => {
-  const { query } = req.query;
-  const restaurants = router.db
-    .get('restaurants')
-    .filter(restaurant => 
-      restaurant.name.toLowerCase().includes(query.toLowerCase()) ||
-      restaurant.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()))
-    )
-    .value();
-  res.json(restaurants);
 });
 
 // Route pour obtenir les plats par restaurant
@@ -266,7 +319,15 @@ server.delete('/users/:userId/favorites/:mealId', authenticateToken, (req, res) 
 // Utiliser le routeur json-server pour toutes les autres routes
 server.use(router);
 
-// Démarrer le serveur
-server.listen(3000, () => {
-  console.log('JSON Server est démarré sur http://localhost:3000');
-}); 
+// Démarrer le serveur seulement si ce n'est pas un test
+if (process.env.NODE_ENV !== 'test') {
+    server.listen(3000, () => {
+        console.log('JSON Server est démarré sur http://localhost:3000');
+    });
+}
+
+// Exporter les fonctions nécessaires pour les tests
+module.exports = {
+    server,
+    resetTestDb
+}; 

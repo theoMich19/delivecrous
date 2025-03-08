@@ -1,0 +1,48 @@
+{
+  "users": [
+    {
+      "id": "1741444344279",
+      "email": "test@test.com",
+      "password": "$2a$10$30k2FgEVVacT4bynTj4ErORrPHNg3h46U2T37YyUn9CaixGwLgKNG",
+      "name": "Test User",
+      "phone": "",
+      "address": "",
+      "favorites": [],
+      "orders": []
+    }
+  ],
+  "restaurants": [
+    {
+      "id": "1",
+      "name": "Test Restaurant",
+      "city": "Paris",
+      "rating": 4.5,
+      "timeEstimate": "20-30 min",
+      "tags": [
+        "Test",
+        "Restaurant"
+      ],
+      "imageUrl": "https://example.com/image.jpg"
+    }
+  ],
+  "meals": [
+    {
+      "id": "1",
+      "name": "Test Meal",
+      "description": "A test meal",
+      "price": "10.99€",
+      "restaurantId": "1",
+      "categoryIds": [
+        "category1"
+      ],
+      "imageUrl": "https://example.com/meal.jpg"
+    }
+  ],
+  "news": [
+    {
+      "id": "1",
+      "title": "Test News",
+      "content": "Test content"
+    }
+  ]
+}
