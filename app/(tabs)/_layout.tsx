@@ -1,45 +1,60 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
+import { Tabs } from "expo-router";
+import { COLORS } from "@/styles/global";
+import { HomeIcon, MenuIcon, ProfileIcon, CartIcon } from "@/components/navigation/TabIcons";
 
-import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
-import { Colors } from '@/constants/Colors';
-import { useColorScheme } from '@/hooks/useColorScheme';
-
-export default function TabLayout() {
-  const colorScheme = useColorScheme();
-
-  return (
-    <Tabs
-      screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: false,
-        tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="explore"
-        options={{
-          title: 'Explore',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="paperplane.fill" color={color} />,
-        }}
-      />
-    </Tabs>
-  );
+export default function TabsLayout() {
+    return (
+        <Tabs
+            screenOptions={{
+                tabBarActiveTintColor: COLORS.secondary,
+                tabBarInactiveTintColor: COLORS.textSecondary,
+                tabBarStyle: {
+                    height: 60,
+                    paddingTop: 5,
+                    paddingBottom: 5,
+                    backgroundColor: COLORS.cardBg,
+                    borderTopColor: COLORS.border,
+                    shadowColor: '#000',
+                    shadowOffset: { width: 0, height: -2 },
+                    shadowOpacity: 0.05,
+                    shadowRadius: 4,
+                    elevation: 5,
+                },
+                headerShown: false,
+                tabBarLabelStyle: {
+                    fontSize: 12,
+                    marginBottom: 3,
+                },
+            }}
+        >
+            <Tabs.Screen
+                name="home"
+                options={{
+                    tabBarLabel: "Accueil",
+                    tabBarIcon: ({ color, size }) => <HomeIcon color={color} size={size} />,
+                }}
+            />
+            <Tabs.Screen
+                name="menu"
+                options={{
+                    tabBarLabel: "Menu",
+                    tabBarIcon: ({ color, size }) => <MenuIcon color={color} size={size} />,
+                }}
+            />
+            <Tabs.Screen
+                name="cart"
+                options={{
+                    tabBarLabel: "Panier",
+                    tabBarIcon: ({ color, size }) => <CartIcon color={color} size={size} />,
+                }}
+            />
+            <Tabs.Screen
+                name="profile"
+                options={{
+                    tabBarLabel: "Profil",
+                    tabBarIcon: ({ color, size }) => <ProfileIcon color={color} size={size} />,
+                }}
+            />
+        </Tabs>
+    );
 }
