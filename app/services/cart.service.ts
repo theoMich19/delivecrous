@@ -19,7 +19,6 @@ export const OrderService = {
     };
   }): Promise<Order> {
     try {
-      // Récupérer le token depuis le stockage
       const token = await AsyncStorage.getItem("userToken");
 
       if (!token) {
@@ -51,7 +50,6 @@ export const OrderService = {
 
   async getUserOrders(): Promise<Order[]> {
     try {
-      // Récupérer le token depuis le stockage
       const token = await AsyncStorage.getItem("userToken");
 
       if (!token) {
@@ -77,7 +75,6 @@ export const OrderService = {
 
   async getOrderById(orderId: string): Promise<Order> {
     try {
-      // Récupérer le token depuis le stockage
       const token = await AsyncStorage.getItem("userToken");
 
       if (!token) {

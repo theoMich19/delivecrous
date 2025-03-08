@@ -79,6 +79,19 @@ export const MenuService = {
     }
   },
 
+  async getMealById(mealId: string): Promise<Meal> {
+    try {
+      const response = await fetch(`${API_URL}/meals/${mealId}`);
+      if (!response.ok) {
+        throw new Error("Erreur lors de la récupération du plat");
+      }
+      return response.json();
+    } catch (error) {
+      console.error("Erreur getMealById:", error);
+      throw error;
+    }
+  },
+
   async getRestaurantById(restaurantId: string): Promise<Restaurant> {
     try {
       const response = await fetch(`${API_URL}/restaurants/${restaurantId}`);

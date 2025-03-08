@@ -15,12 +15,8 @@ export function AuthGuard({ children }: { children: React.ReactNode }) {
     const inTabsGroup = segments[0] === '(tabs)';
 
     if (!user && !inAuthGroup) {
-      // Si l'utilisateur n'est pas connecté et n'est pas sur une page d'auth,
-      // rediriger vers la page de login
       router.replace('/auth/login');
     } else if (user && inAuthGroup) {
-      // Si l'utilisateur est connecté et sur une page d'auth,
-      // rediriger vers la page d'accueil
       router.replace('/(tabs)/home');
     }
   }, [user, segments, isLoading]);

@@ -39,7 +39,6 @@ export default function CartScreen(): JSX.Element {
     const [deliveryInstructions, setDeliveryInstructions] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    // Utiliser les informations d'adresse de l'utilisateur si disponibles
     React.useEffect(() => {
         if (user && user.address) {
             try {
@@ -80,7 +79,6 @@ export default function CartScreen(): JSX.Element {
     const resetOrder = () => {
         clearCart();
 
-        // On ne réinitialise pas les champs d'adresse si l'utilisateur est connecté
         if (!user) {
             setAddress('');
             setCity('');
@@ -115,7 +113,6 @@ export default function CartScreen(): JSX.Element {
             setIsLoading(true);
 
 
-            // Vérifier si le panier contient des articles d'un seul restaurant
             const restaurantIds = new Set(cartItems.map(item => item.restaurantId));
             if (restaurantIds.size > 1) {
                 Alert.alert(
@@ -135,7 +132,6 @@ export default function CartScreen(): JSX.Element {
                 return;
             }
 
-            // Préparer les données de l'adresse de livraison
             const deliveryAddress: DeliveryAddress = {
                 street: address,
                 postalCode,
@@ -145,16 +141,13 @@ export default function CartScreen(): JSX.Element {
                 instructions: deliveryInstructions
             };
 
-            // Préparer les données des articles
             const meals: OrderItem[] = cartItems.map(item => ({
                 mealId: item.id,
                 quantity: item.quantity
             }));
 
-            // Calculer le prix total (enlever le symbole € et convertir en nombre)
             const totalPriceValue = parseFloat(totalPrice.replace('€', '').replace(',', '.'));
 
-            // Créer l'objet de commande
             const orderData = {
                 restaurantId: cartItems[0].restaurantId,
                 meals,
@@ -162,13 +155,10 @@ export default function CartScreen(): JSX.Element {
                 deliveryAddress
             };
 
-            // Envoyer la commande à l'API
             const response = await OrderService.createOrder(orderData);
 
-            // Réinitialiser le panier et les champs
             resetOrder();
 
-            // Afficher un message de succès
             Alert.alert(
                 "Commande confirmée",
                 "Votre commande a été placée avec succès !",

@@ -7,7 +7,7 @@ export interface CartItem {
   quantity: number;
   imageUrl: string;
   restaurantName: string;
-  restaurantId: string; // Ajout de la propriété manquante restaurantId
+  restaurantId: string;
 }
 
 interface CartContextType {
@@ -62,7 +62,7 @@ export const CartProvider: React.FC<CartProviderProps> = ({ children }) => {
           quantity: 1,
           imageUrl: meal.imageUrl,
           restaurantName,
-          restaurantId: meal.restaurantId // Assurez-vous que meal contient restaurantId
+          restaurantId: meal.restaurantId
         }];
       }
     });

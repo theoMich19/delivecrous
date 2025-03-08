@@ -1,20 +1,23 @@
 import { SubHeading, RegularText, Button, Heading } from '@/components/common/crous-components';
 import { COLORS } from '@/styles/global';
 import React, { useState, useEffect } from 'react';
-import { ScrollView, StyleSheet, Switch, View, TextInput, TouchableOpacity, ActivityIndicator, FlatList, Text, Modal } from 'react-native';
+import { ScrollView, StyleSheet, Switch, View, TextInput, TouchableOpacity, ActivityIndicator, FlatList, Text, Modal, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/contexts/AuthContext';
 import { OrderService } from '@/services/cart.service';
 import { Order } from '@/models/order.model';
-import { Feather } from '@expo/vector-icons';
+import { Feather, Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { MenuService } from '@/services/menu.service';
 import { Meal } from '@/models/meal.model';
 import { Restaurant } from '@/models/restaurant.model';
+import { useFavorites } from '@/contexts/FavoritesContext';
 
 export default function ProfileScreen() {
     const router = useRouter();
     const { user, logout, updateProfile } = useAuth();
+    const { favorites, removeFavorite, loadFavorites } = useFavorites();
+
     const [isEditing, setIsEditing] = useState(false);
     const [phone, setPhone] = useState(user?.phone ?? '');
     const [address, setAddress] = useState(user?.address ?? '');
@@ -29,11 +32,57 @@ export default function ProfileScreen() {
     const [restaurantsData, setRestaurantsData] = useState<{ [key: string]: Restaurant }>({});
     const [mealsLoading, setMealsLoading] = useState(false);
 
+    const [favoriteMeals, setFavoriteMeals] = useState<Meal[]>([]);
+    const [favoritesLoading, setFavoritesLoading] = useState(false);
+    const [favoritesError, setFavoritesError] = useState('');
+
     useEffect(() => {
         if (user) {
             loadOrders();
+            loadUserFavorites();
         }
     }, [user]);
+
+    const loadUserFavorites = async () => {
+        if (!user) return;
+
+        try {
+            setFavoritesLoading(true);
+            setFavoritesError('');
+
+
+            if (favorites.length === 0) {
+                await loadFavorites();
+            }
+
+            if (favorites.length > 0) {
+                try {
+
+                    const allMeals = await MenuService.getMeals();
+
+
+                    const favMeals = allMeals.filter(meal => favorites.includes(meal.id));
+                    setFavoriteMeals(favMeals);
+
+
+                    const uniqueRestaurantIds = [...new Set(favMeals.map(meal => meal.restaurantId))];
+                    for (const restaurantId of uniqueRestaurantIds) {
+                        await loadRestaurantInfo(restaurantId);
+                    }
+                } catch (error) {
+                    console.error("Erreur lors du chargement des détails des plats:", error);
+                    setFavoritesError("Impossible de charger les détails des plats favoris");
+                }
+            } else {
+                setFavoriteMeals([]);
+            }
+        } catch (err: any) {
+            console.error("Erreur lors du chargement des favoris:", err);
+            setFavoritesError("Impossible de charger vos plats favoris.");
+        } finally {
+            setFavoritesLoading(false);
+        }
+    };
 
     const loadOrders = async () => {
         try {
@@ -41,7 +90,6 @@ export default function ProfileScreen() {
             setOrdersError('');
             const userOrders = await OrderService.getUserOrders();
             console.log("Données reçues de l'API:", JSON.stringify(userOrders, null, 2));
-
 
             if (Array.isArray(userOrders)) {
                 const validOrders = userOrders.filter(order =>
@@ -98,6 +146,43 @@ export default function ProfileScreen() {
         } finally {
             setMealsLoading(false);
         }
+    };
+
+    const renderFavoriteItem = (meal: Meal) => {
+        const restaurant = restaurantsData[meal.restaurantId];
+
+        return (
+            <TouchableOpacity
+                style={styles.favoriteItem}
+                key={meal.id}
+                onPress={() => router.push(`/menu?mealId=${meal.id}`)}
+            >
+                <Image
+                    source={{ uri: meal.imageUrl }}
+                    style={styles.favoriteMealImage}
+                    defaultSource={require('@assets/images/default42.png')}
+                />
+                <View style={styles.favoriteMealInfo}>
+                    <RegularText style={styles.favoriteMealName}>{meal.name}</RegularText>
+                    {restaurant && (
+                        <RegularText style={styles.favoriteRestaurantName}>
+                            {restaurant.name}
+                        </RegularText>
+                    )}
+                    <RegularText style={styles.favoriteMealPrice}>{meal.price}</RegularText>
+                </View>
+                <TouchableOpacity
+                    style={styles.favoriteHeartButton}
+                    onPress={async () => {
+                        await removeFavorite(meal.id);
+
+                        setFavoriteMeals(prev => prev.filter(m => m.id !== meal.id));
+                    }}
+                >
+                    <Ionicons name="heart" size={24} color={COLORS.accent} />
+                </TouchableOpacity>
+            </TouchableOpacity>
+        );
     };
 
     const handleSaveChanges = async () => {
@@ -491,17 +576,47 @@ export default function ProfileScreen() {
                         )}
                     </View>
 
+                    {/* Section des favoris */}
                     <View style={styles.profileSection}>
-                        <SubHeading style={styles.sectionTitle}>Mes préférences</SubHeading>
-                        <View style={styles.profileInfoItem}>
-                            <RegularText style={styles.infoLabel}>Notifications</RegularText>
-                            <Switch
-                                trackColor={{ false: COLORS.border, true: COLORS.secondary }}
-                                thumbColor={COLORS.cardBg}
-                                value={true}
-                                onValueChange={() => { }}
-                            />
+                        <View style={styles.sectionHeader}>
+                            <SubHeading style={styles.sectionTitle}>Mes plats favoris</SubHeading>
+                            <TouchableOpacity onPress={loadUserFavorites}>
+                                <Feather name="refresh-cw" size={18} color={COLORS.secondary} />
+                            </TouchableOpacity>
                         </View>
+
+                        {favoritesLoading ? (
+                            <View style={styles.loadingContainer}>
+                                <ActivityIndicator size="large" color={COLORS.primary} />
+                                <RegularText style={styles.loadingText}>Chargement de vos favoris...</RegularText>
+                            </View>
+                        ) : favoritesError ? (
+                            <View style={styles.errorOrdersContainer}>
+                                <RegularText style={styles.errorOrdersText}>{favoritesError}</RegularText>
+                                <Button
+                                    title="Réessayer"
+                                    onPress={loadUserFavorites}
+                                    variant="secondary"
+                                    style={styles.retryButton}
+                                />
+                            </View>
+                        ) : favoriteMeals.length === 0 ? (
+                            <View style={styles.emptyOrdersContainer}>
+                                <Feather name="heart" size={50} color={COLORS.border} />
+                                <RegularText style={styles.emptyOrdersText}>
+                                    Vous n'avez pas encore de plats favoris
+                                </RegularText>
+                                <Button
+                                    title="Découvrir les plats"
+                                    onPress={() => router.push("/menu")}
+                                    style={styles.orderNowButton}
+                                />
+                            </View>
+                        ) : (
+                            <View>
+                                {favoriteMeals.map(meal => renderFavoriteItem(meal))}
+                            </View>
+                        )}
                     </View>
 
                     <Button
@@ -845,5 +960,43 @@ const styles = StyleSheet.create({
         fontSize: 18,
         color: COLORS.primary,
         fontWeight: 'bold',
+    },
+    favoriteItem: {
+        flexDirection: 'row',
+        backgroundColor: COLORS.cardBg,
+        borderWidth: 1,
+        borderColor: COLORS.border,
+        borderRadius: 8,
+        marginBottom: 12,
+        padding: 10,
+        alignItems: 'center',
+    },
+    favoriteMealImage: {
+        width: 70,
+        height: 70,
+        borderRadius: 8,
+        backgroundColor: 'lightgray',
+    },
+    favoriteMealInfo: {
+        flex: 1,
+        marginLeft: 12,
+    },
+    favoriteMealName: {
+        fontSize: 16,
+        fontWeight: 'bold',
+        marginBottom: 4,
+    },
+    favoriteRestaurantName: {
+        fontSize: 14,
+        color: COLORS.textSecondary,
+        marginBottom: 4,
+    },
+    favoriteMealPrice: {
+        fontSize: 14,
+        color: COLORS.primary,
+        fontWeight: 'bold',
+    },
+    favoriteHeartButton: {
+        padding: 10,
     },
 });

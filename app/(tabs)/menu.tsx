@@ -13,7 +13,6 @@ import {
 } from 'react-native';
 import { Button, Heading, SubHeading, RegularText, Input } from '@components/common/crous-components';
 import { MenuService } from '@/services/menu.service';
-import { UserService } from '@/services/user.service';
 import { getCategoryIcon } from '@/components/categories/CategoryIcons';
 import { COLORS } from '@/styles/global';
 import Header from '@/components/common/header';
@@ -22,12 +21,15 @@ import { Category, Meal } from '@/models/food.model';
 import { Restaurant } from '@/models/restaurant.model';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
+import { useFavorites } from '@/contexts/FavoritesContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function MenuScreen() {
-    const { addToCart } = useCart()
-    const { user } = useAuth()
+    const { addToCart } = useCart();
+    const { user } = useAuth();
+    const { favorites, addFavorite, removeFavorite } = useFavorites();
+
     const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [meals, setMeals] = useState<Meal[]>([]);
@@ -39,14 +41,10 @@ export default function MenuScreen() {
     const [filteredRestaurants, setFilteredRestaurants] = useState<Restaurant[]>([]);
     const [mealModalVisible, setMealModalVisible] = useState(false);
     const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
-    const [userFavorites, setUserFavorites] = useState<string[]>([]);
 
     useEffect(() => {
         loadInitialData();
-        if (user) {
-            loadUserFavorites();
-        }
-    }, [user]);
+    }, []);
 
     const loadInitialData = async () => {
         const [restaurantsData, categoriesData, mealsData] = await Promise.all([
@@ -61,27 +59,14 @@ export default function MenuScreen() {
         setFilteredRestaurants(restaurantsData);
     };
 
-    const loadUserFavorites = async () => {
-        if (user) {
-            try {
-                const favorites = await UserService.getFavorites(user.id);
-                setUserFavorites(favorites);
-            } catch (error) {
-                console.error('Erreur lors du chargement des favoris:', error);
-            }
-        }
-    };
-
     const toggleFavorite = async (mealId: string) => {
         if (!user) return;
 
         try {
-            if (userFavorites.includes(mealId)) {
-                await UserService.removeFromFavorites(user.id, mealId);
-                setUserFavorites(prev => prev.filter(id => id !== mealId));
+            if (favorites.includes(mealId)) {
+                await removeFavorite(mealId);
             } else {
-                await UserService.addToFavorites(user.id, mealId);
-                setUserFavorites(prev => [...prev, mealId]);
+                await addFavorite(mealId);
             }
         } catch (error) {
             console.error('Erreur lors de la modification des favoris:', error);
@@ -102,21 +87,20 @@ export default function MenuScreen() {
             } else {
                 filtered = meals;
             }
-            
-            // Tri des plats avec les favoris en haut
+
             const sortedMeals = [...filtered].sort((a, b) => {
-                const aIsFavorite = userFavorites.includes(a.id);
-                const bIsFavorite = userFavorites.includes(b.id);
+                const aIsFavorite = favorites.includes(a.id);
+                const bIsFavorite = favorites.includes(b.id);
                 if (aIsFavorite && !bIsFavorite) return -1;
                 if (!aIsFavorite && bIsFavorite) return 1;
                 return 0;
             });
-            
+
             setFilteredMeals(sortedMeals);
         };
 
         updateFilteredMeals();
-    }, [selectedRestaurant, selectedCategory, userFavorites]);
+    }, [selectedRestaurant, selectedCategory, favorites]);
 
     useEffect(() => {
         if (searchText.trim() === '') {
@@ -169,7 +153,7 @@ export default function MenuScreen() {
 
     const renderMealItem = ({ item }: { item: Meal }) => {
         const restaurant = restaurants.find(r => r.id === item.restaurantId);
-        const isFavorite = userFavorites.includes(item.id);
+        const isFavorite = favorites.includes(item.id);
 
         return (
             <TouchableOpacity
@@ -242,7 +226,7 @@ export default function MenuScreen() {
         const mealCategories = categories.filter(category =>
             selectedMeal.categoryIds.includes(category.id)
         );
-        const isFavorite = userFavorites.includes(selectedMeal.id);
+        const isFavorite = favorites.includes(selectedMeal.id);
 
         return (
             <Modal
