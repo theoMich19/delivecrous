@@ -16,11 +16,7 @@
       "email": "ilanlicha22@gmail.com",
       "password": "$2a$10$HKIurn7yB.Re1ZKrJzmBE.cLR79VR7.84J5mtz2ITkMPbdTG9VFnO",
       "name": "Ilan Licha",
-      "favorites": [
-        "meal1",
-        "meal4",
-        "meal19"
-      ],
+      "favorites": ["meal1", "meal4", "meal19"],
       "orders": [],
       "phone": "0781818757",
       "address": "101 rue de la republique 69150"
@@ -32,14 +28,8 @@
       "name": "Theo Michellon",
       "phone": "",
       "address": "",
-      "favorites": [
-        "meal7"
-      ],
-      "orders": [
-        "1741445287651",
-        "1741455075051",
-        "1741455767918"
-      ]
+      "favorites": ["meal7"],
+      "orders": ["1741445287651", "1741455075051", "1741455767918"]
     }
   ],
   "restaurants": [
@@ -53,11 +43,7 @@
       "postalCode": "13009",
       "rating": 4.2,
       "timeEstimate": "15-25 min",
-      "tags": [
-        "Menu à 1€",
-        "Végétarien",
-        "Sur place"
-      ],
+      "tags": ["Menu à 1€", "Végétarien", "Sur place"],
       "openingHours": {
         "monday": "11h00-14h00",
         "tuesday": "11h00-14h00",
@@ -76,11 +62,7 @@
       "postalCode": "13001",
       "rating": 4.5,
       "timeEstimate": "10-20 min",
-      "tags": [
-        "Sandwichs",
-        "À emporter",
-        "Menu étudiant"
-      ],
+      "tags": ["Sandwichs", "À emporter", "Menu étudiant"],
       "openingHours": {
         "monday": "08h00-18h00",
         "tuesday": "08h00-18h00",
@@ -100,11 +82,7 @@
       "postalCode": "13003",
       "rating": 3.9,
       "timeEstimate": "20-30 min",
-      "tags": [
-        "Menu complet",
-        "Végétalien",
-        "Sur place"
-      ],
+      "tags": ["Menu complet", "Végétalien", "Sur place"],
       "openingHours": {
         "monday": "11h30-14h00",
         "tuesday": "11h30-14h00",
@@ -123,11 +101,7 @@
       "postalCode": "13013",
       "rating": 4.7,
       "timeEstimate": "5-15 min",
-      "tags": [
-        "Street food",
-        "Rapide",
-        "À emporter"
-      ],
+      "tags": ["Street food", "Rapide", "À emporter"],
       "openingHours": {
         "monday": "11h00-15h00",
         "tuesday": "11h00-15h00",
@@ -146,12 +120,7 @@
       "postalCode": "13005",
       "rating": 4,
       "timeEstimate": "5-10 min",
-      "tags": [
-        "Snacks",
-        "Boissons",
-        "Café",
-        "À emporter"
-      ],
+      "tags": ["Snacks", "Boissons", "Café", "À emporter"],
       "openingHours": {
         "monday": "07h30-17h00",
         "tuesday": "07h30-17h00",
@@ -170,11 +139,7 @@
       "postalCode": "13100",
       "rating": 4.3,
       "timeEstimate": "15-25 min",
-      "tags": [
-        "Brasserie",
-        "Sur place",
-        "Terrasse"
-      ],
+      "tags": ["Brasserie", "Sur place", "Terrasse"],
       "openingHours": {
         "monday": "11h00-15h00",
         "tuesday": "11h00-15h00",
@@ -194,11 +159,7 @@
       "postalCode": "13013",
       "rating": 4.1,
       "timeEstimate": "5-15 min",
-      "tags": [
-        "Food truck",
-        "Menu étudiant",
-        "À emporter"
-      ],
+      "tags": ["Food truck", "Menu étudiant", "À emporter"],
       "openingHours": {
         "monday": "11h30-14h00",
         "tuesday": "11h30-14h00",
@@ -217,11 +178,7 @@
       "postalCode": "13100",
       "rating": 4.4,
       "timeEstimate": "15-30 min",
-      "tags": [
-        "Cuisine internationale",
-        "Menu à 1€",
-        "Sur place"
-      ],
+      "tags": ["Cuisine internationale", "Menu à 1€", "Sur place"],
       "openingHours": {
         "monday": "11h00-14h00",
         "tuesday": "11h00-14h00",
@@ -240,11 +197,7 @@
       "postalCode": "13013",
       "rating": 3.8,
       "timeEstimate": "10-15 min",
-      "tags": [
-        "Formules midi",
-        "Sandwichs",
-        "À emporter"
-      ],
+      "tags": ["Formules midi", "Sandwichs", "À emporter"],
       "openingHours": {
         "monday": "08h00-16h00",
         "tuesday": "08h00-16h00",
@@ -263,11 +216,7 @@
       "postalCode": "13007",
       "rating": 4.6,
       "timeEstimate": "20-35 min",
-      "tags": [
-        "Gastronomique",
-        "Sur place",
-        "Réservation conseillée"
-      ],
+      "tags": ["Gastronomique", "Sur place", "Réservation conseillée"],
       "openingHours": {
         "monday": "11h30-14h30",
         "tuesday": "11h30-14h30",
@@ -319,12 +268,9 @@
     {
       "id": "meal1",
       "name": "Salade César",
-      "imageUrl": "/api/placeholder/400/300",
+      "imageUrl": "",
       "price": "3,30€",
-      "categoryIds": [
-        "cat1",
-        "cat5"
-      ],
+      "categoryIds": ["cat1", "cat5"],
       "description": "Salade composée avec du poulet grillé, des croûtons à l'ail et du parmesan, le tout assaisonné d'une sauce César crémeuse.",
       "restaurantId": "1",
       "ingredients": [
@@ -334,12 +280,7 @@
         "Parmesan AOP",
         "Sauce César maison"
       ],
-      "allergens": [
-        "Gluten",
-        "Lactose",
-        "Œuf",
-        "Poisson"
-      ],
+      "allergens": ["Gluten", "Lactose", "Œuf", "Poisson"],
       "nutritionalInfo": {
         "Calories": "320 kcal",
         "Protéines": "22g",
@@ -356,11 +297,9 @@
     {
       "id": "meal2",
       "name": "Lasagnes bolognaise",
-      "imageUrl": "/api/placeholder/400/300",
+      "imageUrl": "",
       "price": "3,80€",
-      "categoryIds": [
-        "cat1"
-      ],
+      "categoryIds": ["cat1"],
       "description": "Lasagnes traditionnelles à la bolognaise, préparées avec une sauce tomate mijotée, de la viande de bœuf hachée et une béchamel onctueuse, le tout gratinés au four.",
       "restaurantId": "1",
       "ingredients": [
@@ -372,11 +311,7 @@
         "Béchamel",
         "Emmental râpé"
       ],
-      "allergens": [
-        "Gluten",
-        "Lactose",
-        "Œuf"
-      ],
+      "allergens": ["Gluten", "Lactose", "Œuf"],
       "nutritionalInfo": {
         "Calories": "450 kcal",
         "Protéines": "25g",
@@ -395,12 +330,9 @@
     {
       "id": "meal3",
       "name": "Burger végétarien",
-      "imageUrl": "/api/placeholder/400/300",
+      "imageUrl": "",
       "price": "3,50€",
-      "categoryIds": [
-        "cat1",
-        "cat5"
-      ],
+      "categoryIds": ["cat1", "cat5"],
       "description": "Burger végétarien avec steak de légumes maison, fromage, tomates fraîches et salade croquante, servi dans un pain aux céréales.",
       "restaurantId": "4",
       "ingredients": [
@@ -411,11 +343,7 @@
         "Salade",
         "Sauce maison"
       ],
-      "allergens": [
-        "Gluten",
-        "Lactose",
-        "Fruits à coque"
-      ],
+      "allergens": ["Gluten", "Lactose", "Fruits à coque"],
       "nutritionalInfo": {
         "Calories": "380 kcal",
         "Protéines": "15g",
@@ -432,11 +360,9 @@
     {
       "id": "meal4",
       "name": "Sandwich jambon-beurre",
-      "imageUrl": "/api/placeholder/400/300",
+      "imageUrl": "",
       "price": "2,80€",
-      "categoryIds": [
-        "cat2"
-      ],
+      "categoryIds": ["cat2"],
       "description": "Le classique jambon-beurre dans une baguette croustillante, préparé avec du jambon blanc de qualité et du beurre demi-sel.",
       "restaurantId": "2",
       "ingredients": [
@@ -444,10 +370,7 @@
         "Jambon blanc",
         "Beurre demi-sel"
       ],
-      "allergens": [
-        "Gluten",
-        "Lactose"
-      ],
+      "allergens": ["Gluten", "Lactose"],
       "nutritionalInfo": {
         "Calories": "320 kcal",
         "Protéines": "15g",
@@ -464,12 +387,9 @@
     {
       "id": "meal5",
       "name": "Buddha Bowl Végétalien",
-      "imageUrl": "/api/placeholder/400/300",
+      "imageUrl": "",
       "price": "4,20€",
-      "categoryIds": [
-        "cat1",
-        "cat5"
-      ],
+      "categoryIds": ["cat1", "cat5"],
       "description": "Bowl équilibré à base de quinoa, légumes de saison, avocat, pois chiches grillés et sauce tahini maison. Un repas complet, sain et savoureux.",
       "restaurantId": "3",
       "ingredients": [
@@ -482,9 +402,7 @@
         "Épinards frais",
         "Sauce tahini"
       ],
-      "allergens": [
-        "Sésame"
-      ],
+      "allergens": ["Sésame"],
       "nutritionalInfo": {
         "Calories": "380 kcal",
         "Protéines": "12g",
@@ -502,11 +420,9 @@
     {
       "id": "meal6",
       "name": "Poulet Curry & Riz",
-      "imageUrl": "/api/placeholder/400/300",
+      "imageUrl": "",
       "price": "4,00€",
-      "categoryIds": [
-        "cat1"
-      ],
+      "categoryIds": ["cat1"],
       "description": "Émincé de poulet au curry doux, servi avec du riz basmati et des légumes. Un plat savoureux inspiré de la cuisine indienne.",
       "restaurantId": "8",
       "ingredients": [
@@ -518,9 +434,7 @@
         "Épices curry",
         "Coriandre fraîche"
       ],
-      "allergens": [
-        "Lactose"
-      ],
+      "allergens": ["Lactose"],
       "nutritionalInfo": {
         "Calories": "450 kcal",
         "Protéines": "28g",
@@ -538,11 +452,9 @@
     {
       "id": "meal7",
       "name": "Wrap Thon-Crudités",
-      "imageUrl": "/api/placeholder/400/300",
+      "imageUrl": "",
       "price": "3,20€",
-      "categoryIds": [
-        "cat2"
-      ],
+      "categoryIds": ["cat2"],
       "description": "Wrap frais garni de thon, crudités croquantes et sauce légère. Une option équilibrée et pratique à emporter.",
       "restaurantId": "5",
       "ingredients": [
@@ -554,11 +466,7 @@
         "Maïs",
         "Sauce légère au yaourt"
       ],
-      "allergens": [
-        "Gluten",
-        "Poisson",
-        "Lactose"
-      ],
+      "allergens": ["Gluten", "Poisson", "Lactose"],
       "nutritionalInfo": {
         "Calories": "310 kcal",
         "Protéines": "18g",
@@ -575,11 +483,9 @@
     {
       "id": "meal8",
       "name": "Tarte aux Pommes",
-      "imageUrl": "/api/placeholder/400/300",
+      "imageUrl": "",
       "price": "2,10€",
-      "categoryIds": [
-        "cat3"
-      ],
+      "categoryIds": ["cat3"],
       "description": "Tarte aux pommes traditionnelle avec une pâte feuilletée croustillante et des pommes caramélisées légèrement parfumées à la cannelle.",
       "restaurantId": "6",
       "ingredients": [
@@ -589,11 +495,7 @@
         "Cannelle",
         "Beurre"
       ],
-      "allergens": [
-        "Gluten",
-        "Lactose",
-        "Œuf"
-      ],
+      "allergens": ["Gluten", "Lactose", "Œuf"],
       "nutritionalInfo": {
         "Calories": "280 kcal",
         "Protéines": "3g",
@@ -610,12 +512,9 @@
     {
       "id": "meal9",
       "name": "Smoothie Fruits Rouges",
-      "imageUrl": "/api/placeholder/400/300",
+      "imageUrl": "",
       "price": "2,50€",
-      "categoryIds": [
-        "cat4",
-        "cat3"
-      ],
+      "categoryIds": ["cat4", "cat3"],
       "description": "Smoothie rafraîchissant aux fruits rouges, préparé avec des fruits frais et un yaourt nature. Riche en vitamines et antioxydants.",
       "restaurantId": "7",
       "ingredients": [
@@ -625,9 +524,7 @@
         "Yaourt nature",
         "Miel"
       ],
-      "allergens": [
-        "Lactose"
-      ],
+      "allergens": ["Lactose"],
       "nutritionalInfo": {
         "Calories": "180 kcal",
         "Protéines": "5g",
@@ -644,12 +541,9 @@
     {
       "id": "meal10",
       "name": "Poke Bowl Saumon",
-      "imageUrl": "/api/placeholder/400/300",
+      "imageUrl": "",
       "price": "5,50€",
-      "categoryIds": [
-        "cat1",
-        "cat6"
-      ],
+      "categoryIds": ["cat1", "cat6"],
       "description": "Bowl hawaïen à base de riz, saumon frais mariné, avocat, concombre et graines de sésame. Un repas complet, frais et équilibré.",
       "restaurantId": "10",
       "ingredients": [
@@ -662,11 +556,7 @@
         "Sauce soja",
         "Graines de sésame"
       ],
-      "allergens": [
-        "Poisson",
-        "Soja",
-        "Sésame"
-      ],
+      "allergens": ["Poisson", "Soja", "Sésame"],
       "nutritionalInfo": {
         "Calories": "420 kcal",
         "Protéines": "25g",
@@ -685,12 +575,9 @@
     {
       "id": "meal11",
       "name": "Panini 3 Fromages",
-      "imageUrl": "/api/placeholder/400/300",
+      "imageUrl": "",
       "price": "3,20€",
-      "categoryIds": [
-        "cat2",
-        "cat5"
-      ],
+      "categoryIds": ["cat2", "cat5"],
       "description": "Panini chaud garni de mozzarella, cheddar et chèvre, avec un soupçon de pesto. Croustillant à l'extérieur et fondant à l'intérieur.",
       "restaurantId": "9",
       "ingredients": [
@@ -701,11 +588,7 @@
         "Tomate",
         "Pesto basilic"
       ],
-      "allergens": [
-        "Gluten",
-        "Lactose",
-        "Fruits à coque"
-      ],
+      "allergens": ["Gluten", "Lactose", "Fruits à coque"],
       "nutritionalInfo": {
         "Calories": "380 kcal",
         "Protéines": "18g",
@@ -722,12 +605,9 @@
     {
       "id": "meal12",
       "name": "Salade de Fruits Frais",
-      "imageUrl": "/api/placeholder/400/300",
+      "imageUrl": "",
       "price": "2,20€",
-      "categoryIds": [
-        "cat3",
-        "cat5"
-      ],
+      "categoryIds": ["cat3", "cat5"],
       "description": "Salade composée de fruits frais de saison, parfaite pour un dessert léger et vitaminé.",
       "restaurantId": "2",
       "ingredients": [
@@ -755,12 +635,9 @@
     {
       "id": "meal13",
       "name": "Nuggets de Poulet & Frites",
-      "imageUrl": "/api/placeholder/400/300",
+      "imageUrl": "",
       "price": "3,90€",
-      "categoryIds": [
-        "cat1",
-        "cat6"
-      ],
+      "categoryIds": ["cat1", "cat6"],
       "description": "Nuggets de poulet croustillants servis avec des frites maison et sauce au choix. Un classique revisité.",
       "restaurantId": "4",
       "ingredients": [
@@ -770,10 +647,7 @@
         "Épices",
         "Sauce au choix"
       ],
-      "allergens": [
-        "Gluten",
-        "Œuf"
-      ],
+      "allergens": ["Gluten", "Œuf"],
       "nutritionalInfo": {
         "Calories": "550 kcal",
         "Protéines": "22g",
@@ -793,16 +667,12 @@
     {
       "id": "meal14",
       "name": "Eau Minérale 50cl",
-      "imageUrl": "/api/placeholder/400/300",
+      "imageUrl": "",
       "price": "0,70€",
-      "categoryIds": [
-        "cat4"
-      ],
+      "categoryIds": ["cat4"],
       "description": "Bouteille d'eau minérale naturelle de 50cl.",
       "restaurantId": "3",
-      "ingredients": [
-        "Eau minérale naturelle"
-      ],
+      "ingredients": ["Eau minérale naturelle"],
       "allergens": [],
       "nutritionalInfo": {
         "Calories": "0 kcal",
@@ -817,16 +687,12 @@
     {
       "id": "meal15",
       "name": "Café Expresso",
-      "imageUrl": "/api/placeholder/400/300",
+      "imageUrl": "",
       "price": "0,90€",
-      "categoryIds": [
-        "cat4"
-      ],
+      "categoryIds": ["cat4"],
       "description": "Expresso fraîchement préparé avec un café 100% arabica. Idéal pour une pause énergisante.",
       "restaurantId": "5",
-      "ingredients": [
-        "Café arabica"
-      ],
+      "ingredients": ["Café arabica"],
       "allergens": [],
       "nutritionalInfo": {
         "Calories": "2 kcal",
@@ -841,11 +707,9 @@
     {
       "id": "meal16",
       "name": "Quiche Lorraine",
-      "imageUrl": "/api/placeholder/400/300",
+      "imageUrl": "",
       "price": "2,80€",
-      "categoryIds": [
-        "cat1"
-      ],
+      "categoryIds": ["cat1"],
       "description": "Quiche traditionnelle au jambon et lardons, avec une pâte brisée maison et une garniture crémeuse aux œufs.",
       "restaurantId": "6",
       "ingredients": [
@@ -856,11 +720,7 @@
         "Crème fraîche",
         "Emmental râpé"
       ],
-      "allergens": [
-        "Gluten",
-        "Œuf",
-        "Lactose"
-      ],
+      "allergens": ["Gluten", "Œuf", "Lactose"],
       "nutritionalInfo": {
         "Calories": "320 kcal",
         "Protéines": "15g",
@@ -877,12 +737,9 @@
     {
       "id": "meal17",
       "name": "Salade Niçoise",
-      "imageUrl": "/api/placeholder/400/300",
+      "imageUrl": "",
       "price": "3,50€",
-      "categoryIds": [
-        "cat1",
-        "cat5"
-      ],
+      "categoryIds": ["cat1", "cat5"],
       "description": "Salade traditionnelle composée de tomates, œufs durs, thon, olives et haricots verts. Fraîche et méditerranéenne.",
       "restaurantId": "10",
       "ingredients": [
@@ -894,10 +751,7 @@
         "Olives noires",
         "Vinaigrette à l'huile d'olive"
       ],
-      "allergens": [
-        "Œuf",
-        "Poisson"
-      ],
+      "allergens": ["Œuf", "Poisson"],
       "nutritionalInfo": {
         "Calories": "280 kcal",
         "Protéines": "18g",
@@ -914,21 +768,13 @@
     {
       "id": "meal18",
       "name": "Yaourt Nature",
-      "imageUrl": "/api/placeholder/400/300",
+      "imageUrl": "",
       "price": "0,80€",
-      "categoryIds": [
-        "cat3",
-        "cat5"
-      ],
+      "categoryIds": ["cat3", "cat5"],
       "description": "Yaourt nature crémeux de 125g, produit localement avec du lait frais.",
       "restaurantId": "1",
-      "ingredients": [
-        "Lait entier",
-        "Ferments lactiques"
-      ],
-      "allergens": [
-        "Lactose"
-      ],
+      "ingredients": ["Lait entier", "Ferments lactiques"],
+      "allergens": ["Lactose"],
       "nutritionalInfo": {
         "Calories": "70 kcal",
         "Protéines": "5g",
@@ -945,11 +791,9 @@
     {
       "id": "meal19",
       "name": "Croque-Monsieur",
-      "imageUrl": "/api/placeholder/400/300",
+      "imageUrl": "",
       "price": "3,10€",
-      "categoryIds": [
-        "cat2"
-      ],
+      "categoryIds": ["cat2"],
       "description": "Sandwich chaud garni de jambon et fromage, grillé au four pour un extérieur croustillant et un intérieur fondant.",
       "restaurantId": "7",
       "ingredients": [
@@ -958,10 +802,7 @@
         "Emmental",
         "Béchamel légère"
       ],
-      "allergens": [
-        "Gluten",
-        "Lactose"
-      ],
+      "allergens": ["Gluten", "Lactose"],
       "nutritionalInfo": {
         "Calories": "350 kcal",
         "Protéines": "20g",
@@ -978,12 +819,9 @@
     {
       "id": "meal20",
       "name": "Tiramisu",
-      "imageUrl": "/api/placeholder/400/300",
+      "imageUrl": "",
       "price": "2,50€",
-      "categoryIds": [
-        "cat3",
-        "cat6"
-      ],
+      "categoryIds": ["cat3", "cat6"],
       "description": "Dessert italien traditionnel à base de mascarpone, café et biscuits, légèrement saupoudré de cacao.",
       "restaurantId": "8",
       "ingredients": [
@@ -994,11 +832,7 @@
         "Biscuits cuillère",
         "Cacao en poudre"
       ],
-      "allergens": [
-        "Gluten",
-        "Œuf",
-        "Lactose"
-      ],
+      "allergens": ["Gluten", "Œuf", "Lactose"],
       "nutritionalInfo": {
         "Calories": "290 kcal",
         "Protéines": "6g",

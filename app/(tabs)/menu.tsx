@@ -22,6 +22,7 @@ import { Restaurant } from '@/models/restaurant.model';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFavorites } from '@/contexts/FavoritesContext';
+import PlateIllustration from '@/components/placeholders/PlateIllustration';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
@@ -159,18 +160,21 @@ export default function MenuScreen() {
     const renderMealItem = ({ item }: { item: Meal }) => {
         const restaurant = restaurants.find(r => r.id === item.restaurantId);
         const isFavorite = favorites.includes(item.id);
-
         return (
             <TouchableOpacity
                 key={item.id}
                 style={styles.mealCard}
                 onPress={() => openMealDetails(item)}
             >
-                <Image
-                    source={{ uri: item.imageUrl }}
-                    style={styles.mealImage}
-                    defaultSource={require('@assets/images/default42.png')}
-                />
+                {item.imageUrl ? (
+                    <Image
+                        source={{ uri: item.imageUrl }}
+                        style={styles.mealImage}
+                        defaultSource={require('@assets/images/default42.png')}
+                    />
+                ) : (
+                    <PlateIllustration style={styles.mealImage} />
+                )}
                 <View style={styles.mealInfo}>
                     <View style={styles.mealHeader}>
                         <SubHeading style={styles.mealName}>{item.name}</SubHeading>

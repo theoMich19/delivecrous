@@ -12,6 +12,7 @@ import { MenuService } from '@/services/menu.service';
 import { Meal } from '@/models/meal.model';
 import { Restaurant } from '@/models/restaurant.model';
 import { useFavorites } from '@/contexts/FavoritesContext';
+import PlateIllustration from '@/components/placeholders/PlateIllustration';
 
 export default function ProfileScreen() {
     const router = useRouter();
@@ -157,11 +158,15 @@ export default function ProfileScreen() {
                 key={meal.id}
                 onPress={() => router.push(`/menu?mealId=${meal.id}`)}
             >
-                <Image
-                    source={{ uri: meal.imageUrl }}
-                    style={styles.favoriteMealImage}
-                    defaultSource={require('@assets/images/default42.png')}
-                />
+                {meal.imageUrl ? (
+                    <Image
+                        source={{ uri: meal.imageUrl }}
+                        style={styles.favoriteMealImage}
+                        defaultSource={require('@assets/images/default42.png')}
+                    />
+                ) : (
+                    <PlateIllustration style={styles.favoriteMealImage} />
+                )}
                 <View style={styles.favoriteMealInfo}>
                     <RegularText style={styles.favoriteMealName}>{meal.name}</RegularText>
                     {restaurant && (
