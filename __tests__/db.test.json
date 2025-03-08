@@ -1,9 +1,9 @@
 {
   "users": [
     {
-      "id": "1741444344279",
+      "id": "1741448630053",
       "email": "test@test.com",
-      "password": "$2a$10$30k2FgEVVacT4bynTj4ErORrPHNg3h46U2T37YyUn9CaixGwLgKNG",
+      "password": "$2a$10$Oy95qy0Q8qonG3H7ThNIY.Z2s1J9./H5eKxB0jU.blaaxrhqEYxOG",
       "name": "Test User",
       "phone": "",
       "address": "",
@@ -44,5 +44,7 @@
       "title": "Test News",
       "content": "Test content"
     }
-  ]
+  ],
+  "orders": [],
+  "deliveryAddresses": []
 }

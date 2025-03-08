@@ -1,11 +1,13 @@
 const jsonServer = require("json-server");
 const server = jsonServer.create();
-const router = jsonServer.router(process.env.NODE_ENV === 'test' ? '__tests__/db.test.json' : 'db.json');
+const router = jsonServer.router(
+  process.env.NODE_ENV === "test" ? "__tests__/db.test.json" : "db.json"
+);
 const middlewares = jsonServer.defaults();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const fs = require('fs');
-const path = require('path');
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const fs = require("fs");
+const path = require("path");
 
 const SECRET_KEY = "votre_clé_secrète_ici";
 
@@ -14,53 +16,55 @@ server.use(jsonServer.bodyParser);
 
 // Fonction pour réinitialiser la base de données de test
 const resetTestDb = () => {
-    if (process.env.NODE_ENV === 'test') {
-        const initialData = {
-            users: [],
-            restaurants: [
-                {
-                    id: "1",
-                    name: "Test Restaurant",
-                    city: "Paris",
-                    rating: 4.5,
-                    timeEstimate: "20-30 min",
-                    tags: ["Test", "Restaurant"],
-                    imageUrl: "https://example.com/image.jpg"
-                }
-            ],
-            meals: [
-                {
-                    id: "1",
-                    name: "Test Meal",
-                    description: "A test meal",
-                    price: "10.99€",
-                    restaurantId: "1",
-                    categoryIds: ["category1"],
-                    imageUrl: "https://example.com/meal.jpg"
-                }
-            ],
-            news: [
-                {
-                    id: "1",
-                    title: "Test News",
-                    content: "Test content"
-                }
-            ]
-        };
+  if (process.env.NODE_ENV === "test") {
+    const initialData = {
+      users: [],
+      restaurants: [
+        {
+          id: "1",
+          name: "Test Restaurant",
+          city: "Paris",
+          rating: 4.5,
+          timeEstimate: "20-30 min",
+          tags: ["Test", "Restaurant"],
+          imageUrl: "https://example.com/image.jpg",
+        },
+      ],
+      meals: [
+        {
+          id: "1",
+          name: "Test Meal",
+          description: "A test meal",
+          price: "10.99€",
+          restaurantId: "1",
+          categoryIds: ["category1"],
+          imageUrl: "https://example.com/meal.jpg",
+        },
+      ],
+      news: [
+        {
+          id: "1",
+          title: "Test News",
+          content: "Test content",
+        },
+      ],
+      orders: [],
+      deliveryAddresses: [],
+    };
 
-        // Écrire les données dans le fichier
-        fs.writeFileSync(
-            path.join(__dirname, '__tests__/db.test.json'),
-            JSON.stringify(initialData, null, 2)
-        );
+    // Écrire les données dans le fichier
+    fs.writeFileSync(
+      path.join(__dirname, "__tests__/db.test.json"),
+      JSON.stringify(initialData, null, 2)
+    );
 
-        // Réinitialiser l'état de la base de données
-        router.db.setState(initialData);
-        router.db.write();
+    // Réinitialiser l'état de la base de données
+    router.db.setState(initialData);
+    router.db.write();
 
-        return initialData;
-    }
-    return null;
+    return initialData;
+  }
+  return null;
 };
 
 // Middleware pour vérifier le token JWT
@@ -197,22 +201,25 @@ server.get("/restaurants", (req, res) => {
 });
 
 // Route pour rechercher des restaurants
-server.get('/restaurants/search', (req, res) => {
+server.get("/restaurants/search", (req, res) => {
   const { query } = req.query;
   const restaurants = router.db
-    .get('restaurants')
-    .filter(restaurant => 
-      restaurant.name.toLowerCase().includes(query.toLowerCase()) ||
-      restaurant.tags.some(tag => tag.toLowerCase().includes(query.toLowerCase()))
+    .get("restaurants")
+    .filter(
+      (restaurant) =>
+        restaurant.name.toLowerCase().includes(query.toLowerCase()) ||
+        restaurant.tags.some((tag) =>
+          tag.toLowerCase().includes(query.toLowerCase())
+        )
     )
     .value();
   res.json(restaurants);
 });
 
 // Route pour récupérer les restaurants par ville
-server.get('/restaurants/city/:city', (req, res) => {
+server.get("/restaurants/city/:city", (req, res) => {
   const restaurants = router.db
-    .get('restaurants')
+    .get("restaurants")
     .filter({ city: req.params.city })
     .value();
   res.json(restaurants);
@@ -278,67 +285,91 @@ server.get("/meals", (req, res) => {
 });
 
 // Route pour récupérer les favoris d'un utilisateur
-server.get('/users/:userId/favorites', authenticateToken, (req, res) => {
+server.get("/users/:userId/favorites", authenticateToken, (req, res) => {
   try {
-    const user = router.db.get('users').find({ id: req.params.userId }).value();
+    const user = router.db.get("users").find({ id: req.params.userId }).value();
     if (!user) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+      return res.status(404).json({ message: "Utilisateur non trouvé" });
     }
     res.json(user.favorites);
   } catch (error) {
-    res.status(500).json({ message: 'Erreur lors de la récupération des favoris' });
+    res
+      .status(500)
+      .json({ message: "Erreur lors de la récupération des favoris" });
   }
 });
 
 // Route pour ajouter un repas aux favoris d'un utilisateur
-server.post('/users/:userId/favorites/:mealId', authenticateToken, (req, res) => {
-  try {
-    const user = router.db.get('users').find({ id: req.params.userId }).value();
-    if (!user) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé' });
-    }
-
-    if (!user.favorites.includes(req.params.mealId)) {
-      router.db
-        .get('users')
+server.post(
+  "/users/:userId/favorites/:mealId",
+  authenticateToken,
+  (req, res) => {
+    try {
+      const user = router.db
+        .get("users")
         .find({ id: req.params.userId })
-        .assign({
-          favorites: [...user.favorites, req.params.mealId]
-        })
-        .write();
-    }
+        .value();
+      if (!user) {
+        return res.status(404).json({ message: "Utilisateur non trouvé" });
+      }
 
-    const updatedUser = router.db.get('users').find({ id: req.params.userId }).value();
-    const { password, ...userWithoutPassword } = updatedUser;
-    res.json(userWithoutPassword);
-  } catch (error) {
-    res.status(500).json({ message: 'Erreur lors de l\'ajout aux favoris' });
+      if (!user.favorites.includes(req.params.mealId)) {
+        router.db
+          .get("users")
+          .find({ id: req.params.userId })
+          .assign({
+            favorites: [...user.favorites, req.params.mealId],
+          })
+          .write();
+      }
+
+      const updatedUser = router.db
+        .get("users")
+        .find({ id: req.params.userId })
+        .value();
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      res.status(500).json({ message: "Erreur lors de l'ajout aux favoris" });
+    }
   }
-});
+);
 
 // Route pour supprimer un repas des favoris d'un utilisateur
-server.delete('/users/:userId/favorites/:mealId', authenticateToken, (req, res) => {
-  try {
-    const user = router.db.get('users').find({ id: req.params.userId }).value();
-    if (!user) {
-      return res.status(404).json({ message: 'Utilisateur non trouvé' });
+server.delete(
+  "/users/:userId/favorites/:mealId",
+  authenticateToken,
+  (req, res) => {
+    try {
+      const user = router.db
+        .get("users")
+        .find({ id: req.params.userId })
+        .value();
+      if (!user) {
+        return res.status(404).json({ message: "Utilisateur non trouvé" });
+      }
+
+      router.db
+        .get("users")
+        .find({ id: req.params.userId })
+        .assign({
+          favorites: user.favorites.filter((id) => id !== req.params.mealId),
+        })
+        .write();
+
+      const updatedUser = router.db
+        .get("users")
+        .find({ id: req.params.userId })
+        .value();
+      const { password, ...userWithoutPassword } = updatedUser;
+      res.json(userWithoutPassword);
+    } catch (error) {
+      res
+        .status(500)
+        .json({ message: "Erreur lors de la suppression des favoris" });
     }
-
-    router.db
-      .get('users')
-      .find({ id: req.params.userId })
-      .assign({
-        favorites: user.favorites.filter(id => id !== req.params.mealId)
-      })
-      .write();
-
-    const updatedUser = router.db.get('users').find({ id: req.params.userId }).value();
-    const { password, ...userWithoutPassword } = updatedUser;
-    res.json(userWithoutPassword);
-  } catch (error) {
-    res.status(500).json({ message: 'Erreur lors de la suppression des favoris' });
   }
-});
+);
 
 // Route pour créer une nouvelle commande
 server.post("/orders", authenticateToken, (req, res) => {
@@ -395,7 +426,6 @@ server.post("/orders", authenticateToken, (req, res) => {
 
     res.status(201).json(newOrder);
   } catch (error) {
-    console.error("Erreur lors de la création de la commande:", error);
     res
       .status(500)
       .json({ message: "Erreur serveur lors de la création de la commande" });
@@ -413,11 +443,9 @@ server.get("/orders", authenticateToken, (req, res) => {
     res.json(orders);
   } catch (error) {
     console.error("Erreur lors de la récupération des commandes:", error);
-    res
-      .status(500)
-      .json({
-        message: "Erreur serveur lors de la récupération des commandes",
-      });
+    res.status(500).json({
+      message: "Erreur serveur lors de la récupération des commandes",
+    });
   }
 });
 
@@ -448,11 +476,9 @@ server.get("/orders/:id", authenticateToken, (req, res) => {
     res.json({ ...order, deliveryAddress });
   } catch (error) {
     console.error("Erreur lors de la récupération de la commande:", error);
-    res
-      .status(500)
-      .json({
-        message: "Erreur serveur lors de la récupération de la commande",
-      });
+    res.status(500).json({
+      message: "Erreur serveur lors de la récupération de la commande",
+    });
   }
 });
 
@@ -494,12 +520,9 @@ server.patch("/orders/:id/status", authenticateToken, (req, res) => {
       "Erreur lors de la mise à jour du statut de la commande:",
       error
     );
-    res
-      .status(500)
-      .json({
-        message:
-          "Erreur serveur lors de la mise à jour du statut de la commande",
-      });
+    res.status(500).json({
+      message: "Erreur serveur lors de la mise à jour du statut de la commande",
+    });
   }
 });
 
@@ -507,14 +530,14 @@ server.patch("/orders/:id/status", authenticateToken, (req, res) => {
 server.use(router);
 
 // Démarrer le serveur seulement si ce n'est pas un test
-if (process.env.NODE_ENV !== 'test') {
-    server.listen(3000, () => {
-        console.log('JSON Server est démarré sur http://localhost:3000');
-    });
+if (process.env.NODE_ENV !== "test") {
+  server.listen(3000, () => {
+    console.log("JSON Server est démarré sur http://localhost:3000");
+  });
 }
 
 // Exporter les fonctions nécessaires pour les tests
 module.exports = {
-    server,
-    resetTestDb
-}; 
+  server,
+  resetTestDb,
+};
