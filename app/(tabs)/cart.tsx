@@ -24,8 +24,25 @@ import { useAuth } from '@/contexts/AuthContext';
 import { DeliveryAddress, OrderItem } from '@/models/order.model';
 import Header from '@/components/common/header';
 import { useToast } from '@/contexts/ToastContext';
+import PlateIllustration from '@/components/placeholders/PlateIllustration';
 
 const CHECKOUT_STEPS = ["Panier", "Livraison"];
+
+type ImageKey = 'desserts' | 'sandwich' | 'promo' | 'vege' | 'drink' | 'default';
+
+interface ImageMapping {
+    [key: string]: any;
+}
+
+const imageMapping: ImageMapping = {
+    'desserts.jpg': require('@assets/images/desserts.jpg'),
+    'sandwich.png': require('@assets/images/sandwich.png'),
+    'promo.png': require('@assets/images/promo.png'),
+    'vege.jpg': require('@assets/images/vege.jpg'),
+    'drink.jpg': require('@assets/images/drink.jpg'),
+    'plat.png': require('@assets/images/plat.png'),
+    'default': null
+};
 
 export default function CartScreen(): JSX.Element {
     const router = useRouter();
@@ -258,11 +275,15 @@ export default function CartScreen(): JSX.Element {
                     }
                 ]}
             >
-                <Image
-                    source={{ uri: item.imageUrl }}
-                    style={styles.itemImage}
-                    defaultSource={require('@assets/images/default42.png')}
-                />
+
+                {(imageMapping[item.imageUrl as ImageKey] || imageMapping.default) !== null ? (
+                    <Image
+                        source={imageMapping[item.imageUrl as ImageKey] || imageMapping.default}
+                        style={styles.itemImage}
+                    />
+                ) : (
+                    <PlateIllustration style={styles.itemImage} />
+                )}
                 <View style={styles.itemInfo}>
                     <View>
                         <SubHeading style={styles.itemName}>{item.name}</SubHeading>

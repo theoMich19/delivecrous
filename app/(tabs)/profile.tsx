@@ -16,6 +16,22 @@ import PlateIllustration from '@/components/placeholders/PlateIllustration';
 import { useFocusEffect } from '@react-navigation/native';
 import { useToast } from '@/contexts/ToastContext';
 
+type ImageKey = 'desserts' | 'sandwich' | 'promo' | 'vege' | 'drink' | 'default';
+
+interface ImageMapping {
+    [key: string]: any;
+}
+
+const imageMapping: ImageMapping = {
+    'desserts.jpg': require('@assets/images/desserts.jpg'),
+    'sandwich.png': require('@assets/images/sandwich.png'),
+    'promo.png': require('@assets/images/promo.png'),
+    'vege.jpg': require('@assets/images/vege.jpg'),
+    'drink.jpg': require('@assets/images/drink.jpg'),
+    'plat.png': require('@assets/images/plat.png'),
+    'default': null
+};
+
 export default function ProfileScreen() {
     const router = useRouter();
     const { showToast } = useToast();
@@ -170,11 +186,10 @@ export default function ProfileScreen() {
                 key={meal.id}
                 onPress={() => router.push(`/menu?mealId=${meal.id}`)}
             >
-                {meal.imageUrl ? (
+                {(imageMapping[meal.imageUrl as ImageKey] || imageMapping.default) !== null ? (
                     <Image
-                        source={{ uri: meal.imageUrl }}
+                        source={imageMapping[meal.imageUrl as ImageKey] || imageMapping.default}
                         style={styles.favoriteMealImage}
-                        defaultSource={require('@assets/images/default42.png')}
                     />
                 ) : (
                     <PlateIllustration style={styles.favoriteMealImage} />
