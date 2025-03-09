@@ -21,7 +21,6 @@ export default function ProfileScreen() {
 
     const [isEditing, setIsEditing] = useState(false);
     const [phone, setPhone] = useState(user?.phone ?? '');
-    const [address, setAddress] = useState(user?.address ?? '');
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState('');
     const [orders, setOrders] = useState<Order[]>([]);
@@ -32,6 +31,13 @@ export default function ProfileScreen() {
     const [mealsData, setMealsData] = useState<{ [key: string]: Meal }>({});
     const [restaurantsData, setRestaurantsData] = useState<{ [key: string]: Restaurant }>({});
     const [mealsLoading, setMealsLoading] = useState(false);
+
+    const [address, setAddress] = useState(user?.address?.split(',')[0]?.trim() ?? '');
+    const [postalCode, setPostalCode] = useState(user?.address?.split(',')[1]?.trim() ?? '');
+    const [city, setCity] = useState(user?.address?.split(',')[2]?.trim() ?? '');
+    const [buildingInfo, setBuildingInfo] = useState(user?.buildingInfo ?? '');
+    const [accessCode, setAccessCode] = useState(user?.accessCode ?? '');
+    const [deliveryInstructions, setDeliveryInstructions] = useState(user?.deliveryInstructions ?? '');
 
     const [favoriteMeals, setFavoriteMeals] = useState<Meal[]>([]);
     const [favoritesLoading, setFavoritesLoading] = useState(false);
@@ -90,7 +96,6 @@ export default function ProfileScreen() {
             setOrdersLoading(true);
             setOrdersError('');
             const userOrders = await OrderService.getUserOrders();
-            console.log("Données reçues de l'API:", JSON.stringify(userOrders, null, 2));
 
             if (Array.isArray(userOrders)) {
                 const validOrders = userOrders.filter(order =>
@@ -194,10 +199,17 @@ export default function ProfileScreen() {
         try {
             setIsLoading(true);
             setError('');
+
+            const formattedAddress = `${address}, ${postalCode}, ${city}`;
+
             await updateProfile({
                 phone,
-                address
+                address: formattedAddress,
+                buildingInfo,
+                accessCode,
+                deliveryInstructions
             });
+
             setIsEditing(false);
         } catch (err: any) {
             setError(err.message);
@@ -502,7 +514,7 @@ export default function ProfileScreen() {
                                 </RegularText>
                             )}
                         </View>
-                        <View style={[styles.profileInfoItem, styles.noBorder]}>
+                        {/* <View style={[styles.profileInfoItem, styles.noBorder]}>
                             <RegularText style={styles.infoLabel}>Adresse</RegularText>
                             {isEditing ? (
                                 <TextInput
@@ -525,8 +537,139 @@ export default function ProfileScreen() {
                                 style={styles.saveButton}
                                 disabled={isLoading}
                             />
+                        )} */}
+
+                    </View>
+                    <View style={styles.profileSection}>
+                        <View style={styles.sectionHeader}>
+                            <SubHeading style={styles.sectionTitle}>Mon adresse de livraison</SubHeading>
+                            {!isEditing ? (
+                                <TouchableOpacity onPress={() => setIsEditing(true)}>
+                                    <RegularText style={styles.editButton}>
+                                        Modifier
+                                    </RegularText>
+                                </TouchableOpacity>
+                            ) : null}
+                        </View>
+
+                        {isEditing ? (
+                            <View>
+                                <View style={styles.profileInfoItem}>
+                                    <RegularText style={styles.infoLabel}>Adresse</RegularText>
+                                    <TextInput
+                                        value={address}
+                                        onChangeText={setAddress}
+                                        style={[styles.input, styles.addressInput]}
+                                        placeholder="Numéro et nom de rue"
+                                    />
+                                </View>
+
+                                <View style={styles.profileInfoItem}>
+                                    <RegularText style={styles.infoLabel}>Code postal</RegularText>
+                                    <TextInput
+                                        value={postalCode}
+                                        onChangeText={setPostalCode}
+                                        style={[styles.input, styles.addressInput]}
+                                        placeholder="Ex: 13009"
+                                        keyboardType="numeric"
+                                    />
+                                </View>
+
+                                <View style={styles.profileInfoItem}>
+                                    <RegularText style={styles.infoLabel}>Ville</RegularText>
+                                    <TextInput
+                                        value={city}
+                                        onChangeText={setCity}
+                                        style={[styles.input, styles.addressInput]}
+                                        placeholder="Ex: Marseille"
+                                    />
+                                </View>
+
+                                <View style={styles.profileInfoItem}>
+                                    <RegularText style={styles.infoLabel}>Bâtiment / Étage</RegularText>
+                                    <TextInput
+                                        value={buildingInfo}
+                                        onChangeText={setBuildingInfo}
+                                        style={[styles.input, styles.addressInput]}
+                                        placeholder="Ex: Bâtiment B, 3ème étage"
+                                    />
+                                </View>
+
+                                <View style={styles.profileInfoItem}>
+                                    <RegularText style={styles.infoLabel}>Code d'accès</RegularText>
+                                    <TextInput
+                                        value={accessCode}
+                                        onChangeText={setAccessCode}
+                                        style={[styles.input, styles.addressInput]}
+                                        placeholder="Ex: B123"
+                                    />
+                                </View>
+
+                                <View style={[styles.profileInfoItem, styles.noBorder]}>
+                                    <RegularText style={styles.infoLabel}>Instructions</RegularText>
+                                    <TextInput
+                                        value={deliveryInstructions}
+                                        onChangeText={setDeliveryInstructions}
+                                        style={[styles.input, styles.addressInput]}
+                                        placeholder="Ex: Sonnez à l'interphone"
+                                        multiline
+                                    />
+                                </View>
+
+                                <Button
+                                    title={isLoading ? "Enregistrement..." : "Enregistrer les modifications"}
+                                    onPress={handleSaveChanges}
+                                    style={styles.saveButton}
+                                    disabled={isLoading}
+                                />
+                            </View>
+                        ) : (
+                            <View>
+                                <View style={styles.profileInfoItem}>
+                                    <RegularText style={styles.infoLabel}>Adresse</RegularText>
+                                    <RegularText style={styles.addressText}>
+                                        {address || 'Non renseignée'}
+                                    </RegularText>
+                                </View>
+
+                                <View style={styles.profileInfoItem}>
+                                    <RegularText style={styles.infoLabel}>Code postal</RegularText>
+                                    <RegularText style={styles.addressText}>
+                                        {postalCode || 'Non renseigné'}
+                                    </RegularText>
+                                </View>
+
+                                <View style={styles.profileInfoItem}>
+                                    <RegularText style={styles.infoLabel}>Ville</RegularText>
+                                    <RegularText style={styles.addressText}>
+                                        {city || 'Non renseignée'}
+                                    </RegularText>
+                                </View>
+
+                                {buildingInfo && (
+                                    <View style={styles.profileInfoItem}>
+                                        <RegularText style={styles.infoLabel}>Bâtiment / Étage</RegularText>
+                                        <RegularText style={styles.addressText}>{buildingInfo}</RegularText>
+                                    </View>
+                                )}
+
+                                {accessCode && (
+                                    <View style={styles.profileInfoItem}>
+                                        <RegularText style={styles.infoLabel}>Code d'accès</RegularText>
+                                        <RegularText style={styles.addressText}>{accessCode}</RegularText>
+                                    </View>
+                                )}
+
+                                {deliveryInstructions && (
+                                    <View style={[styles.profileInfoItem, styles.noBorder]}>
+                                        <RegularText style={styles.infoLabel}>Instructions</RegularText>
+                                        <RegularText style={styles.addressText}>{deliveryInstructions}</RegularText>
+                                    </View>
+                                )}
+                            </View>
                         )}
                     </View>
+
 
                     <View style={styles.profileSection}>
                         <View style={styles.sectionHeader}>

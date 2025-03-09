@@ -10,4 +10,7 @@ export interface User {
   favorites: string[];
   orders: string[];
   address?: string;
-} 
+  buildingInfo?: string;
+  accessCode?: string;
+  deliveryInstructions?: string;
+}

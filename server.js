@@ -169,7 +169,13 @@ server.patch("/users/:id", authenticateToken, async (req, res) => {
     }
 
     // Mettre à jour uniquement les champs autorisés
-    const allowedUpdates = ["phone", "address"];
+    const allowedUpdates = [
+      "phone",
+      "address",
+      "buildingInfo",
+      "accessCode",
+      "deliveryInstructions",
+    ];
     const filteredUpdates = Object.keys(updates)
       .filter((key) => allowedUpdates.includes(key))
       .reduce((obj, key) => {

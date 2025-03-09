@@ -40,20 +40,25 @@ export default function CartScreen(): JSX.Element {
     const [isLoading, setIsLoading] = useState(false);
 
     React.useEffect(() => {
-        if (user && user.address) {
+        if (user) {
             try {
-                const addressParts = user.address.split(',');
-                if (addressParts.length >= 3) {
-                    setAddress(addressParts[0].trim());
-                    setPostalCode(addressParts[1].trim());
-                    setCity(addressParts[2].trim());
+                if (user.address) {
+                    const addressParts = user.address.split(',');
+                    if (addressParts.length >= 3) {
+                        setAddress(addressParts[0].trim());
+                        setPostalCode(addressParts[1].trim());
+                        setCity(addressParts[2].trim());
+                    }
                 }
+
+                if (user.buildingInfo) setBuildingInfo(user.buildingInfo);
+                if (user.accessCode) setAccessCode(user.accessCode);
+                if (user.deliveryInstructions) setDeliveryInstructions(user.deliveryInstructions);
             } catch (error) {
-                console.error("Erreur lors du parsing de l'adresse:", error);
+                console.error("Erreur lors du chargement des données d'adresse:", error);
             }
         }
     }, [user]);
-
     const handleNextStep = () => {
         if (currentStep === 0) {
             if (cartItems.length === 0) {
