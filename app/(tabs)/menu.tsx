@@ -27,7 +27,14 @@ import { useFavorites } from '@/contexts/FavoritesContext';
 import PlateIllustration from '@/components/placeholders/PlateIllustration';
 import { useToast } from '@/contexts/ToastContext';
 
+
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
+
+type ImageKey = 'desserts' | 'sandwich' | 'promo' | 'vege' | 'drink' | 'default';
+
+interface ImageMapping {
+    [key: string]: any;
+}
 
 export default function MenuScreen() {
     const { addToCart } = useCart();
@@ -47,6 +54,16 @@ export default function MenuScreen() {
     const [mealModalVisible, setMealModalVisible] = useState(false);
     const [selectedMeal, setSelectedMeal] = useState<Meal | null>(null);
     const [showOnlyFavorites, setShowOnlyFavorites] = useState(false);
+
+    const imageMapping: ImageMapping = {
+        'desserts.jpg': require('@assets/images/desserts.jpg'),
+        'sandwich.png': require('@assets/images/sandwich.png'),
+        'promo.png': require('@assets/images/promo.png'),
+        'vege.jpg': require('@assets/images/vege.jpg'),
+        'drink.jpg': require('@assets/images/drink.jpg'),
+        'plat.png': require('@assets/images/plat.png'),
+        'default': null
+    };
 
     useEffect(() => {
         loadInitialData();
@@ -232,11 +249,10 @@ export default function MenuScreen() {
                 style={styles.mealCard}
                 onPress={() => openMealDetails(item)}
             >
-                {item.imageUrl ? (
+                {(imageMapping[item.imageUrl as ImageKey] || imageMapping.default) !== null ? (
                     <Image
-                        source={{ uri: item.imageUrl }}
+                        source={imageMapping[item.imageUrl as ImageKey] || imageMapping.default}
                         style={styles.mealImage}
-                        defaultSource={require('@assets/images/default42.png')}
                     />
                 ) : (
                     <PlateIllustration style={styles.mealImage} />
@@ -277,9 +293,8 @@ export default function MenuScreen() {
             }}
         >
             <Image
-                source={{ uri: item.imageUrl }}
+                source={require('@assets/images/crouss_restau.jpg')}
                 style={styles.modalRestaurantImage}
-                defaultSource={require('@assets/images/default42.png')}
             />
             <View style={styles.modalRestaurantInfo}>
                 <SubHeading style={styles.modalRestaurantName}>{item.name}</SubHeading>
@@ -334,11 +349,14 @@ export default function MenuScreen() {
                         </View>
 
                         <ScrollView style={styles.mealModalContent}>
-                            <Image
-                                source={{ uri: selectedMeal.imageUrl }}
-                                style={styles.mealModalImage}
-                                defaultSource={require('@assets/images/default42.png')}
-                            />
+                            {(imageMapping[selectedMeal.imageUrl as ImageKey] || imageMapping.default) !== null ? (
+                                <Image
+                                    source={imageMapping[selectedMeal.imageUrl as ImageKey] || imageMapping.default}
+                                    style={styles.mealModalImage}
+                                />
+                            ) : (
+                                <PlateIllustration style={styles.mealImage} />
+                            )}
 
                             <View style={styles.mealModalTitleContainer}>
                                 <Heading style={styles.mealModalTitle}>{selectedMeal.name}</Heading>
@@ -379,9 +397,8 @@ export default function MenuScreen() {
                                         }}
                                     >
                                         <Image
-                                            source={{ uri: mealRestaurant.imageUrl }}
+                                            source={require(`@assets/images/crouss_restau.jpg`)}
                                             style={styles.mealModalRestaurantImage}
-                                            defaultSource={require('@assets/images/default42.png')}
                                         />
                                         <View style={styles.mealModalRestaurantInfo}>
                                             <SubHeading style={styles.modalRestaurantName}>{mealRestaurant.name}</SubHeading>
@@ -533,9 +550,8 @@ export default function MenuScreen() {
                 onPress={() => setRestaurantModalVisible(true)}
             >
                 <Image
-                    source={{ uri: selectedRestaurant.imageUrl }}
+                    source={require('@assets/images/crouss_restau.jpg')}
                     style={styles.selectedRestaurantImage}
-                    defaultSource={require('@assets/images/default42.png')}
                 />
                 <View style={styles.selectedRestaurantInfo}>
                     <SubHeading style={styles.selectedRestaurantName}>
@@ -783,8 +799,10 @@ const styles = StyleSheet.create({
     },
     mealImage: {
         width: 100,
-        height: 100,
-        backgroundColor: 'lightgray',
+        height: '100%',
+        margin: 5,
+        borderRadius: 6,
+        resizeMode: 'contain'
     },
     mealInfo: {
         flex: 1,
