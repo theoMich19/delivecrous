@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import {
     StyleSheet,
     View,
@@ -9,7 +9,9 @@ import {
     Image,
     Modal,
     SafeAreaView,
-    Dimensions
+    Dimensions,
+    Animated,
+    Easing
 } from 'react-native';
 import { Button, Heading, SubHeading, RegularText, Input } from '@components/common/crous-components';
 import { MenuService } from '@/services/menu.service';
@@ -124,37 +126,73 @@ export default function MenuScreen() {
         setMealModalVisible(true);
     }, []);
 
+
+    const CategoryItem = ({ item, isSelected, onSelect }: {
+        item: Category;
+        isSelected: boolean;
+        onSelect: (id: string) => void;
+    }) => {
+        const scaleAnim = useRef(new Animated.Value(1)).current;
+
+        const handlePress = () => {
+            Animated.sequence([
+                Animated.timing(scaleAnim, {
+                    toValue: 1.2,
+                    duration: 150,
+                    easing: Easing.out(Easing.ease),
+                    useNativeDriver: true,
+                }),
+                Animated.timing(scaleAnim, {
+                    toValue: 1,
+                    duration: 150,
+                    easing: Easing.in(Easing.ease),
+                    useNativeDriver: true,
+                })
+            ]).start(() => {
+                onSelect(item.id);
+            });
+        };
+
+        return (
+            <TouchableOpacity
+                style={[
+                    styles.categoryItem,
+                    isSelected && styles.categoryItemSelected
+                ]}
+                onPress={handlePress}
+                activeOpacity={0.8}
+            >
+                <Animated.View
+                    style={[
+                        styles.categoryImageContainer,
+                        isSelected && styles.categoryImageContainerSelected,
+                        { transform: [{ scale: scaleAnim }] }
+                    ]}
+                >
+                    {item.iconType === 'svg' ? (
+                        getCategoryIcon(item.id, 40)
+                    ) : (
+                        <View></View>
+                    )}
+                </Animated.View>
+                <RegularText
+                    style={[
+                        styles.categoryTitle,
+                        isSelected && styles.categoryTitleSelected
+                    ]}
+                >
+                    {item.name}
+                </RegularText>
+            </TouchableOpacity>
+        );
+    };
+
     const renderCategoryItem = useCallback(({ item }: { item: Category }) => (
-        <TouchableOpacity
-            style={[
-                styles.categoryItem,
-                selectedCategory === item.id && styles.categoryItemSelected
-            ]}
-            onPress={() => {
-                setSelectedCategory(selectedCategory === item.id ? null : item.id);
-            }}
-        >
-            <View
-                style={[
-                    styles.categoryImageContainer,
-                    selectedCategory === item.id && styles.categoryImageContainerSelected
-                ]}
-            >
-                {item.iconType === 'svg' ? (
-                    getCategoryIcon(item.id, 40)
-                ) : (
-                    <View></View>
-                )}
-            </View>
-            <RegularText
-                style={[
-                    styles.categoryTitle,
-                    selectedCategory === item.id && styles.categoryTitleSelected
-                ]}
-            >
-                {item.name}
-            </RegularText>
-        </TouchableOpacity>
+        <CategoryItem
+            item={item}
+            isSelected={selectedCategory === item.id}
+            onSelect={(id: string) => setSelectedCategory(selectedCategory === id ? null : id)}
+        />
     ), [selectedCategory]);
 
     const renderMealItem = useCallback(({ item }: { item: Meal }) => {
