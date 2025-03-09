@@ -32,7 +32,10 @@
       "name": "Theo Michellon",
       "phone": "",
       "address": "Test, 00000, Test",
-      "favorites": [],
+      "favorites": [
+        "meal18",
+        "meal12"
+      ],
       "orders": [
         "1741445287651",
         "1741455075051",

@@ -566,7 +566,8 @@ export default function MenuScreen() {
 
                 <View style={styles.sectionContainer}>
                     <View style={styles.sectionHeader}>
-                        <SubHeading>{sectionTitle}</SubHeading>
+                        <View></View>
+                        {/* <SubHeading>{sectionTitle}</SubHeading> */}
                         {filterActions}
                     </View>
 
