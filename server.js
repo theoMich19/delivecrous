@@ -9,12 +9,16 @@ const jwt = require("jsonwebtoken");
 const fs = require("fs");
 const path = require("path");
 
+// Clé secrète pour la génération des tokens JWT
 const SECRET_KEY = "votre_clé_secrète_ici";
 
+// Configuration des middlewares de base
 server.use(middlewares);
 server.use(jsonServer.bodyParser);
 
-// Fonction pour réinitialiser la base de données de test
+/**
+ * Réinitialise la base de données de test avec des données par défaut
+ */
 const resetTestDb = () => {
   if (process.env.NODE_ENV === "test") {
     const initialData = {
@@ -67,7 +71,16 @@ const resetTestDb = () => {
   return null;
 };
 
-// Middleware pour vérifier le token JWT
+/**
+ * ---------- Authentification et gestion des utilisateurs ----------
+ */
+
+/**
+ * Middleware d'authentification pour vérifier les tokens JWT
+ * @param {Object} req - Requête Express
+ * @param {Object} res - Réponse Express
+ * @param {Function} next - Fonction suivante dans la chaîne middleware
+ */
 const authenticateToken = (req, res, next) => {
   const authHeader = req.headers["authorization"];
   const token = authHeader && authHeader.split(" ")[1];
@@ -81,7 +94,17 @@ const authenticateToken = (req, res, next) => {
   });
 };
 
-// Route d'inscription
+// Protection des routes utilisateurs et commandes
+server.use("/users", authenticateToken);
+server.use("/orders", authenticateToken);
+
+/**
+ * Route d'inscription des utilisateurs
+ * @route POST /register
+ * @param {string} email - Email de l'utilisateur
+ * @param {string} password - Mot de passe de l'utilisateur
+ * @param {string} name - Nom de l'utilisateur
+ */
 server.post("/register", async (req, res) => {
   const { email, password, name } = req.body;
 
@@ -118,7 +141,12 @@ server.post("/register", async (req, res) => {
   });
 });
 
-// Route de connexion
+/**
+ * Route de connexion des utilisateurs
+ * @route POST /login
+ * @param {string} email - Email de l'utilisateur
+ * @param {string} password - Mot de passe de l'utilisateur
+ */
 server.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
@@ -151,7 +179,11 @@ server.post("/login", async (req, res) => {
   });
 });
 
-// Route pour mettre à jour le profil utilisateur
+/**
+ * Route de mise à jour des informations utilisateur
+ * @route PATCH /users/:id
+ * @param {string} id - ID de l'utilisateur
+ */
 server.patch("/users/:id", authenticateToken, async (req, res) => {
   const { id } = req.params;
   const updates = req.body;
@@ -196,101 +228,13 @@ server.patch("/users/:id", authenticateToken, async (req, res) => {
   }
 });
 
-// Appliquer l'authentification aux routes protégées
-server.use("/users", authenticateToken);
-server.use("/orders", authenticateToken);
-
-// Route pour récupérer tous les restaurants
-server.get("/restaurants", (req, res) => {
-  const restaurants = router.db.get("restaurants").value();
-  res.json(restaurants);
-});
-
-// Route pour rechercher des restaurants
-server.get("/restaurants/search", (req, res) => {
-  const { query } = req.query;
-  const restaurants = router.db
-    .get("restaurants")
-    .filter(
-      (restaurant) =>
-        restaurant.name.toLowerCase().includes(query.toLowerCase()) ||
-        restaurant.tags.some((tag) =>
-          tag.toLowerCase().includes(query.toLowerCase())
-        )
-    )
-    .value();
-  res.json(restaurants);
-});
-
-// Route pour récupérer les restaurants par ville
-server.get("/restaurants/city/:city", (req, res) => {
-  const restaurants = router.db
-    .get("restaurants")
-    .filter({ city: req.params.city })
-    .value();
-  res.json(restaurants);
-});
-
-// Route pour récupérer un restaurant spécifique
-server.get("/restaurants/:id", (req, res) => {
-  const restaurant = router.db
-    .get("restaurants")
-    .find({ id: req.params.id })
-    .value();
-  if (!restaurant) {
-    return res.status(404).json({ message: "Restaurant non trouvé" });
-  }
-  res.json(restaurant);
-});
-
-// Route pour récupérer les actualités
-server.get("/news", (req, res) => {
-  const news = router.db.get("news").value();
-  res.json(news);
-});
-
-// Route pour récupérer les restaurants par ville
-server.get("/restaurants/city/:city", (req, res) => {
-  const restaurants = router.db
-    .get("restaurants")
-    .filter({ city: req.params.city })
-    .value();
-  res.json(restaurants);
-});
-
-// Route pour rechercher des restaurants
-server.get("/restaurants/search", (req, res) => {
-  const { query } = req.query;
-  const restaurants = router.db
-    .get("restaurants")
-    .filter(
-      (restaurant) =>
-        restaurant.name.toLowerCase().includes(query.toLowerCase()) ||
-        restaurant.tags.some((tag) =>
-          tag.toLowerCase().includes(query.toLowerCase())
-        )
-    )
-    .value();
-  res.json(restaurants);
-});
-
-// Route pour obtenir les plats par restaurant
-server.get("/meals", (req, res) => {
-  const { restaurantId, categoryIds_like } = req.query;
-  let meals = router.db.get("meals").value();
-
-  if (restaurantId) {
-    meals = meals.filter((meal) => meal.restaurantId === restaurantId);
-  }
-
-  if (categoryIds_like) {
-    meals = meals.filter((meal) => meal.categoryIds.includes(categoryIds_like));
-  }
-
-  res.json(meals);
-});
-
-// Route pour récupérer les favoris d'un utilisateur
+/**
+ * Route pour récupérer les favoris d'un utilisateur
+ * @route GET /users/:userId/favorites
+ * @param {string} userId - ID de l'utilisateur
+ * @authenticated
+ * @returns {Array} Liste des IDs des plats favoris
+ */
 server.get("/users/:userId/favorites", authenticateToken, (req, res) => {
   try {
     const user = router.db.get("users").find({ id: req.params.userId }).value();
@@ -305,7 +249,14 @@ server.get("/users/:userId/favorites", authenticateToken, (req, res) => {
   }
 });
 
-// Route pour ajouter un repas aux favoris d'un utilisateur
+/**
+ * Route pour ajouter un plat aux favoris d'un utilisateur
+ * @route POST /users/:userId/favorites/:mealId
+ * @param {string} userId - ID de l'utilisateur
+ * @param {string} mealId - ID du plat à ajouter aux favoris
+ * @authenticated
+ * @returns {Object} Données de l'utilisateur mises à jour (sans le mot de passe)
+ */
 server.post(
   "/users/:userId/favorites/:mealId",
   authenticateToken,
@@ -341,7 +292,14 @@ server.post(
   }
 );
 
-// Route pour supprimer un repas des favoris d'un utilisateur
+/**
+ * Route pour supprimer un plat des favoris d'un utilisateur
+ * @route DELETE /users/:userId/favorites/:mealId
+ * @param {string} userId - ID de l'utilisateur
+ * @param {string} mealId - ID du plat à retirer des favoris
+ * @authenticated
+ * @returns {Object} Données de l'utilisateur mises à jour (sans le mot de passe)
+ */
 server.delete(
   "/users/:userId/favorites/:mealId",
   authenticateToken,
@@ -377,7 +335,129 @@ server.delete(
   }
 );
 
-// Route pour créer une nouvelle commande
+/**
+ * ---------- Restaurants ----------
+ */
+
+/**
+ * Route pour obtenir tous les restaurants
+ * @route GET /restaurants
+ */
+server.get("/restaurants", (req, res) => {
+  const restaurants = router.db.get("restaurants").value();
+  res.json(restaurants);
+});
+
+/**
+ * Route de recherche de restaurants
+ * @route GET /restaurants/search
+ * @param {string} query - Terme de recherche
+ */
+server.get("/restaurants/search", (req, res) => {
+  const { query } = req.query;
+  const restaurants = router.db
+    .get("restaurants")
+    .filter(
+      (restaurant) =>
+        restaurant.name.toLowerCase().includes(query.toLowerCase()) ||
+        restaurant.tags.some((tag) =>
+          tag.toLowerCase().includes(query.toLowerCase())
+        )
+    )
+    .value();
+  res.json(restaurants);
+});
+
+/**
+ * Route pour obtenir les restaurants d'une ville spécifique
+ * @route GET /restaurants/city/:city
+ * @param {string} city - Nom de la ville
+ * @returns {Array} Liste des restaurants dans la ville spécifiée
+ */
+server.get("/restaurants/city/:city", (req, res) => {
+  const restaurants = router.db
+    .get("restaurants")
+    .filter({ city: req.params.city })
+    .value();
+  res.json(restaurants);
+});
+
+/**
+ * Route pour obtenir un restaurant par son ID
+ * @route GET /restaurants/:id
+ * @param {string} id - ID du restaurant
+ * @returns {Object} Données du restaurant
+ */
+server.get("/restaurants/:id", (req, res) => {
+  const restaurant = router.db
+    .get("restaurants")
+    .find({ id: req.params.id })
+    .value();
+  if (!restaurant) {
+    return res.status(404).json({ message: "Restaurant non trouvé" });
+  }
+  res.json(restaurant);
+});
+
+/**
+ * Route pour rechercher des restaurants par nom ou tags
+ * @route GET /restaurants/search
+ * @param {string} query - Terme de recherche pour le nom ou les tags
+ * @returns {Array} Liste des restaurants correspondant aux critères de recherche
+ */
+server.get("/restaurants/search", (req, res) => {
+  const { query } = req.query;
+  const restaurants = router.db
+    .get("restaurants")
+    .filter(
+      (restaurant) =>
+        restaurant.name.toLowerCase().includes(query.toLowerCase()) ||
+        restaurant.tags.some((tag) =>
+          tag.toLowerCase().includes(query.toLowerCase())
+        )
+    )
+    .value();
+  res.json(restaurants);
+});
+
+/**
+ * ---------- Plats ----------
+ */
+
+/**
+ * Route pour récupérer les plats avec filtres optionnels
+ * @route GET /meals
+ * @param {string} [restaurantId] - ID du restaurant pour filtrer les plats
+ * @param {string} [categoryIds_like] - ID de catégorie pour filtrer les plats
+ * @returns {Array} Liste des plats correspondant aux critères de filtrage
+ */
+server.get("/meals", (req, res) => {
+  const { restaurantId, categoryIds_like } = req.query;
+  let meals = router.db.get("meals").value();
+
+  if (restaurantId) {
+    meals = meals.filter((meal) => meal.restaurantId === restaurantId);
+  }
+
+  if (categoryIds_like) {
+    meals = meals.filter((meal) => meal.categoryIds.includes(categoryIds_like));
+  }
+
+  res.json(meals);
+});
+
+/**
+ * ---------- Commandes ----------
+ */
+
+/**
+ * Route de création d'une commande
+ * @route POST /orders
+ * @param {string} restaurantId - ID du restaurant
+ * @param {Array} meals - Liste des plats commandés
+ * @param {number} totalPrice - Prix total de la commande
+ * @param {Object} deliveryAddress - Adresse de livraison
+ */
 server.post("/orders", authenticateToken, (req, res) => {
   const { restaurantId, meals, totalPrice, deliveryAddress } = req.body;
   const userId = req.user.id;
@@ -438,7 +518,12 @@ server.post("/orders", authenticateToken, (req, res) => {
   }
 });
 
-// Route pour récupérer toutes les commandes d'un utilisateur
+/**
+ * Route pour récupérer toutes les commandes d'un utilisateur
+ * @route GET /orders
+ * @authenticated
+ * @returns {Array} Liste des commandes de l'utilisateur
+ */
 server.get("/orders", authenticateToken, (req, res) => {
   const userId = req.user.id;
 
@@ -455,7 +540,15 @@ server.get("/orders", authenticateToken, (req, res) => {
   }
 });
 
-// Route pour récupérer une commande spécifique
+/**
+ * Route pour récupérer une commande spécifique avec son adresse de livraison
+ * @route GET /orders/:id
+ * @param {string} id - ID de la commande
+ * @authenticated
+ * @returns {Object} Détails de la commande avec l'adresse de livraison
+ * @throws {404} Si la commande n'existe pas
+ * @throws {403} Si l'utilisateur n'est pas autorisé à accéder à cette commande
+ */
 server.get("/orders/:id", authenticateToken, (req, res) => {
   const orderId = req.params.id;
   const userId = req.user.id;
@@ -488,7 +581,12 @@ server.get("/orders/:id", authenticateToken, (req, res) => {
   }
 });
 
-// Route pour mettre à jour le statut d'une commande
+/**
+ * Route de mise à jour du statut d'une commande
+ * @route PATCH /orders/:id/status
+ * @param {string} id - ID de la commande
+ * @param {string} status - Nouveau statut ('delivered', 'pending', 'preparing', 'canceled')
+ */
 server.patch("/orders/:id/status", authenticateToken, (req, res) => {
   const orderId = req.params.id;
   const { status } = req.body;
@@ -531,6 +629,29 @@ server.patch("/orders/:id/status", authenticateToken, (req, res) => {
     });
   }
 });
+
+/**
+ * ---------- Actualités ----------
+ */
+
+/**
+ * Route pour récupérer toutes les actualités
+ * @route GET /news
+ * @returns {Array<Object>} Liste des actualités
+ * @returns {string} news[].id - ID de l'actualité
+ * @returns {string} news[].title - Titre de l'actualité
+ * @returns {string} news[].content - Contenu de l'actualité
+ * @returns {string} [news[].imageUrl] - URL de l'image associée (optionnel)
+ * @returns {string} [news[].date] - Date de publication (optionnel)
+ */
+server.get("/news", (req, res) => {
+  const news = router.db.get("news").value();
+  res.json(news);
+});
+
+/**
+ * ---------- Serveur ----------
+ */
 
 // Utiliser le routeur json-server pour toutes les autres routes
 server.use(router);

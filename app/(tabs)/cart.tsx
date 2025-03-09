@@ -7,7 +7,6 @@ import {
     TouchableOpacity,
     Image,
     SafeAreaView,
-    StatusBar,
     Alert,
     KeyboardAvoidingView,
     Platform,
@@ -21,7 +20,6 @@ import { Feather } from '@expo/vector-icons';
 import { useCart, CartItem } from '@/contexts/CartContext';
 import Stepper from '@/components/order/stepper/stepper';
 import { OrderService } from '@/services/cart.service';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '@/contexts/AuthContext';
 import { DeliveryAddress, OrderItem } from '@/models/order.model';
 import Header from '@/components/common/header';
