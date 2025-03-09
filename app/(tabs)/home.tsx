@@ -69,7 +69,6 @@ const styles = StyleSheet.create({
         backgroundColor: COLORS.border,
         marginVertical: 15,
     },
-    // Vous pouvez supprimer les styles liés aux nouvelles qui sont maintenant dans le composant NewsItem
 });
 
 export default HomeScreen;

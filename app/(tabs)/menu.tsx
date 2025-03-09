@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import {
     StyleSheet,
     View,
@@ -48,7 +48,7 @@ export default function MenuScreen() {
         loadInitialData();
     }, []);
 
-    const loadInitialData = async () => {
+    const loadInitialData = useCallback(async () => {
         const [restaurantsData, categoriesData, mealsData] = await Promise.all([
             MenuService.getRestaurants(),
             MenuService.getCategories(),
@@ -59,9 +59,9 @@ export default function MenuScreen() {
         setMeals(mealsData);
         setFilteredMeals(mealsData);
         setFilteredRestaurants(restaurantsData);
-    };
+    }, []);
 
-    const toggleFavorite = async (mealId: string) => {
+    const toggleFavorite = useCallback(async (mealId: string) => {
         if (!user) return;
 
         try {
@@ -73,7 +73,7 @@ export default function MenuScreen() {
         } catch (error) {
             console.error('Erreur lors de la modification des favoris:', error);
         }
-    };
+    }, [user, favorites, removeFavorite, addFavorite]);
 
     useEffect(() => {
         const updateFilteredMeals = async () => {
@@ -117,14 +117,14 @@ export default function MenuScreen() {
             );
             setFilteredRestaurants(filtered);
         }
-    }, [searchText]);
+    }, [searchText, restaurants]);
 
-    const openMealDetails = (meal: Meal) => {
+    const openMealDetails = useCallback((meal: Meal) => {
         setSelectedMeal(meal);
         setMealModalVisible(true);
-    };
+    }, []);
 
-    const renderCategoryItem = ({ item }: { item: Category }) => (
+    const renderCategoryItem = useCallback(({ item }: { item: Category }) => (
         <TouchableOpacity
             style={[
                 styles.categoryItem,
@@ -155,9 +155,9 @@ export default function MenuScreen() {
                 {item.name}
             </RegularText>
         </TouchableOpacity>
-    );
+    ), [selectedCategory]);
 
-    const renderMealItem = ({ item }: { item: Meal }) => {
+    const renderMealItem = useCallback(({ item }: { item: Meal }) => {
         const restaurant = restaurants.find(r => r.id === item.restaurantId);
         const isFavorite = favorites.includes(item.id);
         return (
@@ -199,9 +199,9 @@ export default function MenuScreen() {
                 </View>
             </TouchableOpacity>
         );
-    };
+    }, [restaurants, favorites, selectedRestaurant, openMealDetails]);
 
-    const renderRestaurantModalItem = ({ item }: { item: Restaurant }) => (
+    const renderRestaurantModalItem = useCallback(({ item }: { item: Restaurant }) => (
         <TouchableOpacity
             key={item.id}
             style={styles.modalRestaurantItem}
@@ -226,9 +226,9 @@ export default function MenuScreen() {
                 </View>
             </View>
         </TouchableOpacity>
-    );
+    ), []);
 
-    const renderMealDetailsModal = () => {
+    const mealDetailsModal = useMemo(() => {
         if (!selectedMeal) return null;
 
         const mealRestaurant = restaurants.find(r => r.id === selectedMeal.restaurantId);
@@ -385,7 +385,148 @@ export default function MenuScreen() {
                 </View>
             </Modal>
         );
-    };
+    }, [selectedMeal, mealModalVisible, restaurants, categories, favorites, toggleFavorite, addToCart]);
+
+    const sectionTitle = useMemo(() => {
+        if (selectedCategory) {
+            const categoryName = categories.find(c => c.id === selectedCategory)?.name || "";
+            if (selectedRestaurant) {
+                return `${categoryName} - ${selectedRestaurant.name}`;
+            }
+            return categoryName;
+        }
+        if (selectedRestaurant) {
+            return `Tous les plats - ${selectedRestaurant.name}`;
+        }
+        return "Tous les plats";
+    }, [selectedCategory, selectedRestaurant, categories]);
+
+    const emptyState = useMemo(() => (
+        <View style={styles.emptyStateContainer}>
+            <RegularText style={styles.emptyStateText}>
+                {showOnlyFavorites
+                    ? "Vous n'avez pas encore de plats favoris"
+                    : "Aucun plat ne correspond à vos critères de recherche."}
+            </RegularText>
+        </View>
+    ), [showOnlyFavorites]);
+
+    const restaurantModal = useMemo(() => (
+        <Modal
+            animationType="slide"
+            transparent={false}
+            visible={restaurantModalVisible}
+            onRequestClose={() => setRestaurantModalVisible(false)}
+        >
+            <SafeAreaView style={styles.modalContainer}>
+                <View style={styles.modalHeader}>
+                    <TouchableOpacity
+                        style={styles.modalCloseButton}
+                        onPress={() => setRestaurantModalVisible(false)}
+                    >
+                        <Text style={styles.modalCloseText}>Annuler</Text>
+                    </TouchableOpacity>
+                    <SubHeading style={styles.modalTitle}>Choisir un restaurant</SubHeading>
+                    <View style={{ width: 60 }} />
+                </View>
+
+                <View style={styles.modalSearchContainer}>
+                    <Input
+                        placeholder="Rechercher un restaurant..."
+                        value={searchText}
+                        onChangeText={setSearchText}
+                        style={styles.modalSearchInput}
+                    />
+                </View>
+
+                <ScrollView style={styles.modalContent}>
+                    {filteredRestaurants.map(restaurant => (
+                        renderRestaurantModalItem({ item: restaurant })
+                    ))}
+                </ScrollView>
+            </SafeAreaView>
+        </Modal>
+    ), [restaurantModalVisible, filteredRestaurants, searchText, renderRestaurantModalItem]);
+
+    const selectedRestaurantCard = useMemo(() => {
+        if (!selectedRestaurant) {
+            return (
+                <Button
+                    title="Choisir un restaurant"
+                    onPress={() => setRestaurantModalVisible(true)}
+                    style={styles.chooseRestaurantButton}
+                />
+            );
+        }
+
+        return (
+            <TouchableOpacity
+                style={styles.selectedRestaurantCard}
+                onPress={() => setRestaurantModalVisible(true)}
+            >
+                <Image
+                    source={{ uri: selectedRestaurant.imageUrl }}
+                    style={styles.selectedRestaurantImage}
+                    defaultSource={require('@assets/images/default42.png')}
+                />
+                <View style={styles.selectedRestaurantInfo}>
+                    <SubHeading style={styles.selectedRestaurantName}>
+                        {selectedRestaurant.name}
+                    </SubHeading>
+                    <View style={styles.ratingContainer}>
+                        <View style={styles.ratingBadge}>
+                            <RegularText>{selectedRestaurant.rating.toFixed(1)}</RegularText>
+                        </View>
+                        <RegularText> • {selectedRestaurant.timeEstimate}</RegularText>
+                    </View>
+                </View>
+                <View style={styles.changeButton}>
+                    <Text style={styles.changeButtonText}>Changer</Text>
+                </View>
+            </TouchableOpacity>
+        );
+    }, [selectedRestaurant]);
+
+    const filterActions = useMemo(() => (
+        <View style={styles.filterActions}>
+            {user && (
+                <TouchableOpacity
+                    style={[
+                        styles.favoriteFilterButton,
+                        showOnlyFavorites && styles.favoriteFilterActive
+                    ]}
+                    onPress={() => setShowOnlyFavorites(!showOnlyFavorites)}
+                >
+                    <Ionicons
+                        name={showOnlyFavorites ? "heart" : "heart-outline"}
+                        size={18}
+                        color={showOnlyFavorites ? COLORS.accent : COLORS.textSecondary}
+                    />
+                    <RegularText
+                        style={[
+                            styles.favoriteFilterText,
+                            showOnlyFavorites && styles.favoriteFilterTextActive
+                        ]}
+                    >
+                        Favoris
+                    </RegularText>
+                </TouchableOpacity>
+            )}
+            {selectedCategory && (
+                <TouchableOpacity onPress={() => setSelectedCategory(null)}>
+                    <RegularText style={styles.clearFilter}>Effacer</RegularText>
+                </TouchableOpacity>
+            )}
+        </View>
+    ), [user, showOnlyFavorites, selectedCategory]);
+
+    const mealsList = useMemo(() => {
+        if (filteredMeals.length === 0) {
+            return emptyState;
+        }
+
+        return filteredMeals.map(meal => renderMealItem({ item: meal }));
+    }, [filteredMeals, renderMealItem, emptyState]);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -401,38 +542,7 @@ export default function MenuScreen() {
                         )}
                     </View>
 
-                    {selectedRestaurant ? (
-                        <TouchableOpacity
-                            style={styles.selectedRestaurantCard}
-                            onPress={() => setRestaurantModalVisible(true)}
-                        >
-                            <Image
-                                source={{ uri: selectedRestaurant.imageUrl }}
-                                style={styles.selectedRestaurantImage}
-                                defaultSource={require('@assets/images/default42.png')}
-                            />
-                            <View style={styles.selectedRestaurantInfo}>
-                                <SubHeading style={styles.selectedRestaurantName}>
-                                    {selectedRestaurant.name}
-                                </SubHeading>
-                                <View style={styles.ratingContainer}>
-                                    <View style={styles.ratingBadge}>
-                                        <RegularText>{selectedRestaurant.rating.toFixed(1)}</RegularText>
-                                    </View>
-                                    <RegularText> • {selectedRestaurant.timeEstimate}</RegularText>
-                                </View>
-                            </View>
-                            <View style={styles.changeButton}>
-                                <Text style={styles.changeButtonText}>Changer</Text>
-                            </View>
-                        </TouchableOpacity>
-                    ) : (
-                        <Button
-                            title="Choisir un restaurant"
-                            onPress={() => setRestaurantModalVisible(true)}
-                            style={styles.chooseRestaurantButton}
-                        />
-                    )}
+                    {selectedRestaurantCard}
                 </View>
 
                 <View style={styles.sectionContainer}>
@@ -456,96 +566,16 @@ export default function MenuScreen() {
 
                 <View style={styles.sectionContainer}>
                     <View style={styles.sectionHeader}>
-                        <SubHeading>
-                            {selectedCategory
-                                ? categories.find(c => c.id === selectedCategory)?.name
-                                : "Tous les plats"}
-                            {selectedRestaurant && ` - ${selectedRestaurant.name}`}
-                        </SubHeading>
-                        <View style={styles.filterActions}>
-                            {user && (
-                                <TouchableOpacity
-                                    style={[
-                                        styles.favoriteFilterButton,
-                                        showOnlyFavorites && styles.favoriteFilterActive
-                                    ]}
-                                    onPress={() => setShowOnlyFavorites(!showOnlyFavorites)}
-                                >
-                                    <Ionicons
-                                        name={showOnlyFavorites ? "heart" : "heart-outline"}
-                                        size={18}
-                                        color={showOnlyFavorites ? COLORS.accent : COLORS.textSecondary}
-                                    />
-                                    <RegularText
-                                        style={[
-                                            styles.favoriteFilterText,
-                                            showOnlyFavorites && styles.favoriteFilterTextActive
-                                        ]}
-                                    >
-                                        Favoris
-                                    </RegularText>
-                                </TouchableOpacity>
-                            )}
-                            {selectedCategory && (
-                                <TouchableOpacity onPress={() => setSelectedCategory(null)}>
-                                    <RegularText style={styles.clearFilter}>Effacer</RegularText>
-                                </TouchableOpacity>
-                            )}
-                        </View>
+                        <SubHeading>{sectionTitle}</SubHeading>
+                        {filterActions}
                     </View>
 
-
-
-                    {filteredMeals.length > 0 ? (
-                        filteredMeals.map(meal => renderMealItem({ item: meal }))
-                    ) : (
-                        <View style={styles.emptyStateContainer}>
-                            <RegularText style={styles.emptyStateText}>
-                                {showOnlyFavorites
-                                    ? "Vous n'avez pas encore de plats favoris"
-                                    : "Aucun plat ne correspond à vos critères de recherche."}
-                            </RegularText>
-                        </View>
-                    )}
+                    {mealsList}
                 </View>
             </ScrollView>
 
-            <Modal
-                animationType="slide"
-                transparent={false}
-                visible={restaurantModalVisible}
-                onRequestClose={() => setRestaurantModalVisible(false)}
-            >
-                <SafeAreaView style={styles.modalContainer}>
-                    <View style={styles.modalHeader}>
-                        <TouchableOpacity
-                            style={styles.modalCloseButton}
-                            onPress={() => setRestaurantModalVisible(false)}
-                        >
-                            <Text style={styles.modalCloseText}>Annuler</Text>
-                        </TouchableOpacity>
-                        <SubHeading style={styles.modalTitle}>Choisir un restaurant</SubHeading>
-                        <View style={{ width: 60 }} />
-                    </View>
-
-                    <View style={styles.modalSearchContainer}>
-                        <Input
-                            placeholder="Rechercher un restaurant..."
-                            value={searchText}
-                            onChangeText={setSearchText}
-                            style={styles.modalSearchInput}
-                        />
-                    </View>
-
-                    <ScrollView style={styles.modalContent}>
-                        {filteredRestaurants.map(restaurant => (
-                            renderRestaurantModalItem({ item: restaurant })
-                        ))}
-                    </ScrollView>
-                </SafeAreaView>
-            </Modal>
-
-            {renderMealDetailsModal()}
+            {restaurantModal}
+            {mealDetailsModal}
         </SafeAreaView>
     );
 }

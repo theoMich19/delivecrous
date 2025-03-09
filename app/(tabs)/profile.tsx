@@ -1,6 +1,6 @@
 import { SubHeading, RegularText, Button, Heading } from '@/components/common/crous-components';
 import { COLORS } from '@/styles/global';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { ScrollView, StyleSheet, Switch, View, TextInput, TouchableOpacity, ActivityIndicator, FlatList, Text, Modal, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useAuth } from '@/contexts/AuthContext';
@@ -29,6 +29,7 @@ export default function ProfileScreen() {
     const [ordersError, setOrdersError] = useState('');
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [detailModalVisible, setDetailModalVisible] = useState(false);
+    const [allOrdersModalVisible, setAllOrdersModalVisible] = useState(false);
     const [mealsData, setMealsData] = useState<{ [key: string]: Meal }>({});
     const [restaurantsData, setRestaurantsData] = useState<{ [key: string]: Restaurant }>({});
     const [mealsLoading, setMealsLoading] = useState(false);
@@ -39,7 +40,6 @@ export default function ProfileScreen() {
     const [buildingInfo, setBuildingInfo] = useState(user?.buildingInfo ?? '');
     const [accessCode, setAccessCode] = useState(user?.accessCode ?? '');
     const [deliveryInstructions, setDeliveryInstructions] = useState(user?.deliveryInstructions ?? '');
-
     const [favoriteMeals, setFavoriteMeals] = useState<Meal[]>([]);
     const [favoritesLoading, setFavoritesLoading] = useState(false);
     const [favoritesError, setFavoritesError] = useState('');
@@ -61,6 +61,9 @@ export default function ProfileScreen() {
         }, [user])
     );
 
+    const displayedOrders = useMemo(() => {
+        return orders.slice(0, 3);
+    }, [orders]);
 
     const loadFavoriteMealDetails = async () => {
         try {
@@ -353,11 +356,55 @@ export default function ProfileScreen() {
             </View>
         );
     };
+    const renderAllOrdersModal = () => {
+        return (
+            <Modal
+                animationType="slide"
+                transparent={true}
+                visible={allOrdersModalVisible}
+                onRequestClose={() => setAllOrdersModalVisible(false)}
+            >
+                <View style={styles.modalOverlay}>
+                    <View style={[styles.modalContainer, styles.allOrdersModalContainer]}>
+                        <View style={styles.modalHeader}>
+                            <SubHeading style={styles.modalTitle}>Toutes mes commandes</SubHeading>
+                            <TouchableOpacity
+                                onPress={() => setAllOrdersModalVisible(false)}
+                                style={styles.modalCloseButton}
+                            >
+                                <Feather name="x" size={24} color={COLORS.text} />
+                            </TouchableOpacity>
+                        </View>
+
+                        <ScrollView
+                            style={styles.modalContent}
+                            contentContainerStyle={styles.modalContentContainer}
+                            showsVerticalScrollIndicator={true}
+                        >
+                            {orders.length === 0 ? (
+                                <View style={styles.emptyOrdersContainer}>
+                                    <Feather name="shopping-bag" size={50} color={COLORS.border} />
+                                    <RegularText style={styles.emptyOrdersText}>
+                                        Vous n'avez pas encore passé de commande
+                                    </RegularText>
+                                </View>
+                            ) : (
+                                orders.map(order => renderOrderItem(order))
+                            )}
+                        </ScrollView>
+                    </View>
+                </View>
+            </Modal>
+        );
+    };
+
 
     const renderOrderDetailModal = () => {
         if (!selectedOrder) return null;
         const orderId = selectedOrder.id ? selectedOrder.id.toString() : "N/A";
         const displayId = orderId !== "N/A" ? orderId.slice(-6) : "N/A";
+
+        const needsExtraPadding = selectedOrder.status === 'pending';
 
         return (
             <Modal
@@ -378,7 +425,14 @@ export default function ProfileScreen() {
                             </TouchableOpacity>
                         </View>
 
-                        <ScrollView style={styles.modalContent}>
+                        <ScrollView
+                            style={styles.modalContent}
+                            contentContainerStyle={[
+                                styles.modalContentContainer,
+                                needsExtraPadding && styles.modalContentWithButton
+                            ]}
+                            showsVerticalScrollIndicator={true}
+                        >
                             <View style={styles.orderDetailSection}>
                                 <View style={styles.orderDetailHeader}>
                                     <View>
@@ -516,31 +570,6 @@ export default function ProfileScreen() {
                                 </RegularText>
                             )}
                         </View>
-                        {/* <View style={[styles.profileInfoItem, styles.noBorder]}>
-                            <RegularText style={styles.infoLabel}>Adresse</RegularText>
-                            {isEditing ? (
-                                <TextInput
-                                    value={address}
-                                    onChangeText={setAddress}
-                                    style={[styles.input, styles.addressInput]}
-                                    placeholder="Votre adresse"
-                                    multiline
-                                />
-                            ) : (
-                                <RegularText style={styles.addressText}>
-                                    {user?.address ?? 'Non renseignée'}
-                                </RegularText>
-                            )}
-                        </View>
-                        {isEditing && (
-                            <Button
-                                title={isLoading ? "Enregistrement..." : "Enregistrer les modifications"}
-                                onPress={handleSaveChanges}
-                                style={styles.saveButton}
-                                disabled={isLoading}
-                            />
-                        )} */}
-
                     </View>
                     <View style={styles.profileSection}>
                         <View style={styles.sectionHeader}>
@@ -710,15 +739,13 @@ export default function ProfileScreen() {
                             </View>
                         ) : (
                             <View>
-                                {orders.map(order => renderOrderItem(order))}
+                                {displayedOrders.map(order => renderOrderItem(order))}
 
                                 {orders.length > 3 && (
                                     <Button
                                         title="Voir toutes mes commandes"
                                         variant="secondary"
-                                        onPress={() => {
-                                            alert("Navigation vers l'historique complet des commandes");
-                                        }}
+                                        onPress={() => setAllOrdersModalVisible(true)}
                                         style={styles.viewAllButton}
                                     />
                                 )}
@@ -777,6 +804,7 @@ export default function ProfileScreen() {
                 </View>
             </ScrollView>
             {renderOrderDetailModal()}
+            {renderAllOrdersModal()}
         </SafeAreaView>
     );
 }
@@ -986,6 +1014,16 @@ const styles = StyleSheet.create({
     },
     viewAllButton: {
         marginTop: 10,
+    },
+    allOrdersModalContainer: {
+        height: '80%',
+        width: '95%',
+    },
+    modalContentContainer: {
+        paddingBottom: 30,
+    },
+    modalContentWithButton: {
+        paddingBottom: 30,
     },
     modalOverlay: {
         flex: 1,
