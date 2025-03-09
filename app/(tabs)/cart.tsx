@@ -23,6 +23,7 @@ import { OrderService } from '@/services/cart.service';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '@/contexts/AuthContext';
 import { DeliveryAddress, OrderItem } from '@/models/order.model';
+import Header from '@/components/common/header';
 
 const CHECKOUT_STEPS = ["Panier", "Livraison"];
 
@@ -376,28 +377,7 @@ export default function CartScreen(): JSX.Element {
 
     return (
         <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
-
-            <View style={styles.header}>
-                <SubHeading style={styles.headerTitle}>Mon Panier</SubHeading>
-                {currentStep === 0 && cartItems.length > 0 && (
-                    <TouchableOpacity
-                        style={styles.clearButton}
-                        onPress={() => {
-                            Alert.alert(
-                                "Vider le panier",
-                                "Êtes-vous sûr de vouloir vider votre panier ?",
-                                [
-                                    { text: "Annuler", style: "cancel" },
-                                    { text: "Confirmer", onPress: clearCart }
-                                ]
-                            );
-                        }}
-                    >
-                        <RegularText style={styles.clearButtonText}>Vider</RegularText>
-                    </TouchableOpacity>
-                )}
-            </View>
+            <Header />
             <Stepper steps={CHECKOUT_STEPS} currentStep={currentStep} />
             {renderStepContent()}
         </SafeAreaView>
@@ -408,18 +388,6 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: COLORS.background,
-    },
-    header: {
-        backgroundColor: COLORS.primary,
-        padding: 15,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    headerTitle: {
-        color: 'white',
-        flex: 1,
-        textAlign: 'center',
     },
     clearButton: {
         padding: 5,

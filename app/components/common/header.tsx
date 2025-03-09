@@ -1,17 +1,17 @@
 import { COLORS } from "@/styles/global"
-import { View, StatusBar, StyleSheet, TouchableOpacity, Text } from "react-native"
+import { View, StatusBar, StyleSheet, Text } from "react-native"
 import { SubHeading } from "./crous-components"
 import { useRouter } from "expo-router"
-import { Feather } from '@expo/vector-icons'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
 
 const Header = () => {
-
     return (
-        <View>
-            <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
-            <View style={styles.header}>
-                <View style={styles.headerContent}>
-                    <SubHeading style={styles.headerTitle}>DeliCrouss</SubHeading>
+        <View style={styles.header}>
+            <StatusBar backgroundColor={COLORS.primary} barStyle="light-content" />
+            <View style={styles.headerContent}>
+                <View style={styles.titleContainer}>
+                    <MaterialCommunityIcons name="silverware-fork-knife" size={24} color="white" />
+                    <Text style={styles.headerTitle}>DeliCrouss</Text>
                 </View>
             </View>
         </View>
@@ -25,11 +25,18 @@ const styles = StyleSheet.create({
     },
     headerContent: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         alignItems: 'center',
+    },
+    titleContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
     },
     headerTitle: {
         color: 'white',
+        fontSize: 18,
+        fontWeight: 'bold',
+        marginLeft: 10,
     },
 })
 
