@@ -13,6 +13,7 @@ import { Meal } from '@/models/meal.model';
 import { Restaurant } from '@/models/restaurant.model';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import PlateIllustration from '@/components/placeholders/PlateIllustration';
+import { useFocusEffect } from '@react-navigation/native';
 
 export default function ProfileScreen() {
     const router = useRouter();
@@ -44,52 +45,53 @@ export default function ProfileScreen() {
     const [favoritesError, setFavoritesError] = useState('');
 
     useEffect(() => {
-        if (user) {
-            loadOrders();
-            loadUserFavorites();
+        if (user && favorites.length > 0) {
+            loadFavoriteMealDetails();
+        } else if (favorites.length === 0) {
+            setFavoriteMeals([]);
         }
-    }, [user]);
+    }, [favorites, user]);
+
+    useFocusEffect(
+        React.useCallback(() => {
+            if (user) {
+                loadOrders();
+            }
+            return () => { };
+        }, [user])
+    );
+
+
+    const loadFavoriteMealDetails = async () => {
+        try {
+            setFavoritesLoading(true);
+            setFavoritesError('');
+
+            const allMeals = await MenuService.getMeals();
+            const favMeals = allMeals.filter(meal => favorites.includes(meal.id));
+            setFavoriteMeals(favMeals);
+
+            const uniqueRestaurantIds = [...new Set(favMeals.map(meal => meal.restaurantId))];
+            for (const restaurantId of uniqueRestaurantIds) {
+                await loadRestaurantInfo(restaurantId);
+            }
+        } catch (error) {
+            setFavoritesError("Impossible de charger les détails des plats favoris");
+        } finally {
+            setFavoritesLoading(false);
+        }
+    };
 
     const loadUserFavorites = async () => {
         if (!user) return;
 
         try {
-            setFavoritesLoading(true);
-            setFavoritesError('');
-
-
-            if (favorites.length === 0) {
-                await loadFavorites();
-            }
-
-            if (favorites.length > 0) {
-                try {
-
-                    const allMeals = await MenuService.getMeals();
-
-
-                    const favMeals = allMeals.filter(meal => favorites.includes(meal.id));
-                    setFavoriteMeals(favMeals);
-
-
-                    const uniqueRestaurantIds = [...new Set(favMeals.map(meal => meal.restaurantId))];
-                    for (const restaurantId of uniqueRestaurantIds) {
-                        await loadRestaurantInfo(restaurantId);
-                    }
-                } catch (error) {
-                    console.error("Erreur lors du chargement des détails des plats:", error);
-                    setFavoritesError("Impossible de charger les détails des plats favoris");
-                }
-            } else {
-                setFavoriteMeals([]);
-            }
-        } catch (err: any) {
-            console.error("Erreur lors du chargement des favoris:", err);
+            await loadFavorites();
+        } catch (err) {
             setFavoritesError("Impossible de charger vos plats favoris.");
-        } finally {
-            setFavoritesLoading(false);
         }
     };
+
 
     const loadOrders = async () => {
         try {

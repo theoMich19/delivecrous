@@ -33,14 +33,16 @@
       "phone": "",
       "address": "Test, 00000, Test",
       "favorites": [
-        "meal7"
+        "meal7",
+        "meal4"
       ],
       "orders": [
         "1741445287651",
         "1741455075051",
         "1741455767918",
         "1741519123327",
-        "1741519171715"
+        "1741519171715",
+        "1741519683087"
       ],
       "buildingInfo": "B",
       "accessCode": "1234",
@@ -1102,6 +1104,20 @@
       "totalPrice": 3.2,
       "status": "pending",
       "createdAt": "2025-03-09T11:19:31.715Z"
+    },
+    {
+      "id": "1741519683087",
+      "userId": "1741445263142",
+      "restaurantId": "7",
+      "meals": [
+        {
+          "mealId": "meal9",
+          "quantity": 1
+        }
+      ],
+      "totalPrice": 2.5,
+      "status": "pending",
+      "createdAt": "2025-03-09T11:28:03.087Z"
     }
   ]
 }
