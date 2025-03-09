@@ -12,9 +12,8 @@ const NewsItem: React.FC<NewsItemProps> = ({ item }) => {
     return (
         <View style={styles.newsCard}>
             <Image
-                source={{ uri: item.imageUrl }}
+                source={require('@assets/images/actu_crouss.png')}
                 style={styles.newsImage}
-                defaultSource={require('@assets/images/default42.png')}
             />
             <View style={styles.newsContent}>
                 <SubHeading style={styles.newsTitle}>{item.title}</SubHeading>
