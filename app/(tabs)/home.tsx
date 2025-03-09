@@ -3,14 +3,13 @@ import Header from '@/components/common/header';
 import { COLORS } from '@/styles/global';
 import { NewsService } from '@/services/news.service';
 import { News } from '@/models/news.model';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
     StyleSheet,
     View,
     SafeAreaView,
     ScrollView,
     Image,
-    TouchableOpacity,
 } from 'react-native';
 
 const HomeScreen = () => {
@@ -20,7 +19,10 @@ const HomeScreen = () => {
         const loadNews = async () => {
             try {
                 const newsData = await NewsService.getPublishedNews();
-                setNews(newsData);
+                const sortedNews = [...newsData].sort((a, b) =>
+                    new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
+                );
+                setNews(sortedNews);
             } catch (error) {
                 console.error('Erreur lors du chargement des news:', error);
             }
@@ -29,10 +31,7 @@ const HomeScreen = () => {
     }, []);
 
     const renderNewsItem = ({ item }: { item: News }) => (
-        <TouchableOpacity
-            style={styles.newsCard}
-            onPress={() => alert(`Lire l'article: ${item.title}`)}
-        >
+        <View style={styles.newsCard}>
             <Image
                 source={{ uri: item.imageUrl }}
                 style={styles.newsImage}
@@ -46,8 +45,17 @@ const HomeScreen = () => {
                     {new Date(item.publishedAt).toLocaleDateString('fr-FR')}
                 </RegularText>
             </View>
-        </TouchableOpacity>
+        </View>
     );
+
+    const newsItems = useMemo(() => {
+        return news.map((item, index) => (
+            <View key={item.id}>
+                {renderNewsItem({ item })}
+                {index < news.length - 1 && <View style={styles.divider} />}
+            </View>
+        ));
+    }, [news]);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -55,17 +63,13 @@ const HomeScreen = () => {
             <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
                 <View style={styles.sectionContainer}>
                     <SubHeading>Dernières actualités</SubHeading>
-                    {news.map((item, index) => (
-                        <View key={item.id}>
-                            {renderNewsItem({ item })}
-                            {index < news.length - 1 && <View style={styles.divider} />}
-                        </View>
-                    ))}
+                    {newsItems}
                 </View>
             </ScrollView>
         </SafeAreaView>
     );
 };
+
 
 const styles = StyleSheet.create({
     container: {
