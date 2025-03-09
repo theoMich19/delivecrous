@@ -14,9 +14,11 @@ import { Restaurant } from '@/models/restaurant.model';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import PlateIllustration from '@/components/placeholders/PlateIllustration';
 import { useFocusEffect } from '@react-navigation/native';
+import { useToast } from '@/contexts/ToastContext';
 
 export default function ProfileScreen() {
     const router = useRouter();
+    const { showToast } = useToast();
     const { user, logout, updateProfile } = useAuth();
     const { favorites, removeFavorite, loadFavorites } = useFavorites();
 
@@ -228,9 +230,10 @@ export default function ProfileScreen() {
             await OrderService.updateOrderStatus(orderId, 'canceled');
             loadOrders();
             setDetailModalVisible(false);
+            showToast("Commande annulée avec succès", "success");
         } catch (error) {
             console.error("Erreur lors de l'annulation de la commande:", error);
-            alert("Impossible d'annuler la commande. Veuillez réessayer plus tard.");
+            showToast("Impossible d'annuler la commande. Veuillez réessayer plus tard.", "error");
         }
     };
 

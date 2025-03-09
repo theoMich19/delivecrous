@@ -30,12 +30,9 @@
       "email": "theo.michellon@gmail.com",
       "password": "$2a$10$oIB4abyKYL0m58IeRIfyyOFHdHWsNo5uKVP.TMy0yq68YWZdhmYgy",
       "name": "Theo Michellon",
-      "phone": "",
+      "phone": "123688",
       "address": "Test, 00000, Test",
-      "favorites": [
-        "meal18",
-        "meal12"
-      ],
+      "favorites": [],
       "orders": [
         "1741445287651",
         "1741455075051",
@@ -44,11 +41,12 @@
         "1741519171715",
         "1741519683087",
         "1741522528024",
-        "1741523399119"
+        "1741523399119",
+        "1741528887576"
       ],
-      "buildingInfo": "B",
-      "accessCode": "1234",
-      "deliveryInstructions": "Ouioui"
+      "buildingInfo": "",
+      "accessCode": "",
+      "deliveryInstructions": ""
     }
   ],
   "restaurants": [
@@ -1192,6 +1190,20 @@
       "totalPrice": 7.9,
       "status": "pending",
       "createdAt": "2025-03-09T12:29:59.119Z"
+    },
+    {
+      "id": "1741528887576",
+      "userId": "1741445263142",
+      "restaurantId": "2",
+      "meals": [
+        {
+          "mealId": "meal12",
+          "quantity": 1
+        }
+      ],
+      "totalPrice": 2.2,
+      "status": "pending",
+      "createdAt": "2025-03-09T14:01:27.576Z"
     }
   ]
 }

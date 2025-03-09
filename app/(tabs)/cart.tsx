@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
     StyleSheet,
     View,
@@ -11,7 +11,8 @@ import {
     Alert,
     KeyboardAvoidingView,
     Platform,
-    ActivityIndicator
+    ActivityIndicator,
+    Animated
 } from 'react-native';
 import { Button, Heading, SubHeading, RegularText, Input } from '@components/common/crous-components';
 import { COLORS } from '@/styles/global';
@@ -24,11 +25,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useAuth } from '@/contexts/AuthContext';
 import { DeliveryAddress, OrderItem } from '@/models/order.model';
 import Header from '@/components/common/header';
+import { useToast } from '@/contexts/ToastContext';
 
 const CHECKOUT_STEPS = ["Panier", "Livraison"];
 
 export default function CartScreen(): JSX.Element {
     const router = useRouter();
+    const { showToast } = useToast();
     const { cartItems, totalPrice, removeFromCart, increaseQuantity, decreaseQuantity, clearCart } = useCart();
     const { user } = useAuth();
     const [currentStep, setCurrentStep] = useState(0);
@@ -39,6 +42,27 @@ export default function CartScreen(): JSX.Element {
     const [accessCode, setAccessCode] = useState('');
     const [deliveryInstructions, setDeliveryInstructions] = useState('');
     const [isLoading, setIsLoading] = useState(false);
+    const totalValueAnim = useRef(new Animated.Value(1)).current;
+    const prevTotalPrice = useRef(totalPrice);
+
+    useEffect(() => {
+        if (prevTotalPrice.current !== totalPrice) {
+            Animated.sequence([
+                Animated.timing(totalValueAnim, {
+                    toValue: 1.1,
+                    duration: 150,
+                    useNativeDriver: true
+                }),
+                Animated.timing(totalValueAnim, {
+                    toValue: 1,
+                    duration: 150,
+                    useNativeDriver: true
+                })
+            ]).start();
+
+            prevTotalPrice.current = totalPrice;
+        }
+    }, [totalPrice]);
 
     React.useEffect(() => {
         if (user) {
@@ -60,16 +84,17 @@ export default function CartScreen(): JSX.Element {
             }
         }
     }, [user]);
+
     const handleNextStep = () => {
         if (currentStep === 0) {
             if (cartItems.length === 0) {
-                Alert.alert("Panier vide", "Ajoutez des articles à votre panier pour continuer.");
+                showToast("Ajoutez des articles à votre panier pour continuer.", "warning");
                 return;
             }
             setCurrentStep(1);
         } else if (currentStep === 1) {
             if (address.trim() === '' || city.trim() === '' || postalCode.trim() === '') {
-                Alert.alert("Informations manquantes", "Veuillez remplir tous les champs obligatoires.");
+                showToast("Veuillez remplir tous les champs obligatoires.", "error");
                 return;
             }
             handleCheckout();
@@ -118,22 +143,15 @@ export default function CartScreen(): JSX.Element {
         try {
             setIsLoading(true);
 
-
             const restaurantIds = new Set(cartItems.map(item => item.restaurantId));
             if (restaurantIds.size > 1) {
-                Alert.alert(
-                    "Commande impossible",
-                    "Votre panier contient des articles de différents restaurants. Veuillez commander auprès d'un seul restaurant à la fois."
-                );
+                showToast("Votre panier contient des articles de différents restaurants. Veuillez commander auprès d'un seul restaurant à la fois.", "error");
                 setIsLoading(false);
                 return;
             }
 
             if (cartItems.length === 0 || !cartItems[0].restaurantId) {
-                Alert.alert(
-                    "Erreur",
-                    "Impossible de déterminer le restaurant. Veuillez réessayer."
-                );
+                showToast("Impossible de déterminer le restaurant. Veuillez réessayer.", "error");
                 setIsLoading(false);
                 return;
             }
@@ -165,18 +183,10 @@ export default function CartScreen(): JSX.Element {
 
             resetOrder();
 
-            Alert.alert(
-                "Commande confirmée",
-                "Votre commande a été placée avec succès !",
-                [
-                    {
-                        text: "OK",
-                        onPress: () => {
-                            router.push("/home");
-                        }
-                    }
-                ]
-            );
+            showToast("Votre commande a été placée avec succès !", "success");
+            setTimeout(() => {
+                router.push("/home");
+            }, 1500);
         } catch (error) {
             console.error("Erreur lors de la soumission de la commande:", error);
             Alert.alert(
@@ -188,43 +198,111 @@ export default function CartScreen(): JSX.Element {
         }
     };
 
-    const renderCartItem = (item: CartItem) => (
-        <View key={item.id} style={styles.cartItem}>
-            <Image
-                source={{ uri: item.imageUrl }}
-                style={styles.itemImage}
-                defaultSource={require('@assets/images/default42.png')}
-            />
-            <View style={styles.itemInfo}>
-                <View>
-                    <SubHeading style={styles.itemName}>{item.name}</SubHeading>
-                    <RegularText style={styles.itemRestaurant}>{item.restaurantName}</RegularText>
-                    <Text style={styles.itemPrice}>{item.price}</Text>
-                </View>
-                <View style={styles.quantityControls}>
-                    <TouchableOpacity
-                        style={styles.quantityButton}
-                        onPress={() => decreaseQuantity(item.id)}
-                    >
-                        <Feather name="minus" size={18} color={COLORS.primary} />
-                    </TouchableOpacity>
-                    <Text style={styles.quantityText}>{item.quantity}</Text>
-                    <TouchableOpacity
-                        style={styles.quantityButton}
-                        onPress={() => increaseQuantity(item.id)}
-                    >
-                        <Feather name="plus" size={18} color={COLORS.primary} />
-                    </TouchableOpacity>
-                </View>
-            </View>
-            <TouchableOpacity
-                style={styles.removeButton}
-                onPress={() => removeFromCart(item.id)}
+    const AnimatedCartItem = ({ item }: { item: CartItem }) => {
+        const scaleAnim = useRef(new Animated.Value(1)).current;
+        const opacityAnim = useRef(new Animated.Value(1)).current;
+
+        const handleIncrease = () => {
+            Animated.sequence([
+                Animated.timing(scaleAnim, {
+                    toValue: 1.05,
+                    duration: 100,
+                    useNativeDriver: true
+                }),
+                Animated.timing(scaleAnim, {
+                    toValue: 1,
+                    duration: 100,
+                    useNativeDriver: true
+                })
+            ]).start();
+
+            increaseQuantity(item.id);
+        };
+
+        const handleDecrease = () => {
+            if (item.quantity > 1) {
+                Animated.sequence([
+                    Animated.timing(scaleAnim, {
+                        toValue: 0.95,
+                        duration: 100,
+                        useNativeDriver: true
+                    }),
+                    Animated.timing(scaleAnim, {
+                        toValue: 1,
+                        duration: 100,
+                        useNativeDriver: true
+                    })
+                ]).start();
+
+                decreaseQuantity(item.id);
+            } else {
+                handleRemove();
+            }
+        };
+
+        const handleRemove = () => {
+            Animated.timing(opacityAnim, {
+                toValue: 0,
+                duration: 300,
+                useNativeDriver: true
+            }).start(() => {
+                removeFromCart(item.id);
+            });
+        };
+
+        return (
+            <Animated.View
+                style={[
+                    styles.cartItem,
+                    {
+                        opacity: opacityAnim,
+                        transform: [{ scale: scaleAnim }]
+                    }
+                ]}
             >
-                <Feather name="trash-2" size={20} color={COLORS.accent} />
-            </TouchableOpacity>
-        </View>
-    );
+                <Image
+                    source={{ uri: item.imageUrl }}
+                    style={styles.itemImage}
+                    defaultSource={require('@assets/images/default42.png')}
+                />
+                <View style={styles.itemInfo}>
+                    <View>
+                        <SubHeading style={styles.itemName}>{item.name}</SubHeading>
+                        <RegularText style={styles.itemRestaurant}>{item.restaurantName}</RegularText>
+                        <Text style={styles.itemPrice}>{item.price}</Text>
+                    </View>
+                    <View style={styles.quantityControls}>
+                        <TouchableOpacity
+                            style={styles.quantityButton}
+                            onPress={handleDecrease}
+                        >
+                            <Feather name="minus" size={18} color={COLORS.primary} />
+                        </TouchableOpacity>
+                        <Animated.Text
+                            style={[
+                                styles.quantityText,
+                                { transform: [{ scale: scaleAnim }] }
+                            ]}
+                        >
+                            {item.quantity}
+                        </Animated.Text>
+                        <TouchableOpacity
+                            style={styles.quantityButton}
+                            onPress={handleIncrease}
+                        >
+                            <Feather name="plus" size={18} color={COLORS.primary} />
+                        </TouchableOpacity>
+                    </View>
+                </View>
+                <TouchableOpacity
+                    style={styles.removeButton}
+                    onPress={handleRemove}
+                >
+                    <Feather name="trash-2" size={20} color={COLORS.accent} />
+                </TouchableOpacity>
+            </Animated.View>
+        );
+    };
 
     const renderStepContent = () => {
         if (currentStep === 0) {
@@ -232,7 +310,7 @@ export default function CartScreen(): JSX.Element {
                 <>
                     <ScrollView style={styles.content}>
                         {cartItems.length > 0 ? (
-                            cartItems.map(renderCartItem)
+                            cartItems.map(item => <AnimatedCartItem key={item.id} item={item} />)
                         ) : (
                             <View style={styles.emptyCartContainer}>
                                 <Feather name="shopping-cart" size={80} color={COLORS.border} />
@@ -253,7 +331,14 @@ export default function CartScreen(): JSX.Element {
                         <View style={styles.orderSummary}>
                             <View style={styles.summaryRow}>
                                 <RegularText style={styles.summaryLabel}>Sous-total</RegularText>
-                                <Text style={styles.summaryValue}>{totalPrice}</Text>
+                                <Animated.Text
+                                    style={[
+                                        styles.summaryValue,
+                                        { transform: [{ scale: totalValueAnim }] }
+                                    ]}
+                                >
+                                    {totalPrice}
+                                </Animated.Text>
                             </View>
                             <View style={styles.summaryRow}>
                                 <RegularText style={styles.summaryLabel}>Frais de livraison</RegularText>
@@ -262,7 +347,14 @@ export default function CartScreen(): JSX.Element {
                             <View style={styles.summaryDivider} />
                             <View style={styles.summaryRow}>
                                 <SubHeading style={styles.totalLabel}>Total</SubHeading>
-                                <Text style={styles.totalValue}>{totalPrice}</Text>
+                                <Animated.Text
+                                    style={[
+                                        styles.totalValue,
+                                        { transform: [{ scale: totalValueAnim }] }
+                                    ]}
+                                >
+                                    {totalPrice}
+                                </Animated.Text>
                             </View>
                             <Button
                                 title="Suivant - Livraison"
@@ -343,7 +435,14 @@ export default function CartScreen(): JSX.Element {
                     <View style={styles.orderSummary}>
                         <View style={styles.summaryRow}>
                             <SubHeading style={styles.totalLabel}>Total à payer</SubHeading>
-                            <Text style={styles.totalValue}>{totalPrice}</Text>
+                            <Animated.Text
+                                style={[
+                                    styles.totalValue,
+                                    { transform: [{ scale: totalValueAnim }] }
+                                ]}
+                            >
+                                {totalPrice}
+                            </Animated.Text>
                         </View>
 
                         <View style={styles.buttonRow}>
@@ -351,13 +450,11 @@ export default function CartScreen(): JSX.Element {
                                 title="Retour au panier"
                                 onPress={handlePreviousStep}
                                 variant="secondary"
-                                style={styles.backButton}
                                 disabled={isLoading}
                             />
                             <Button
                                 title={isLoading ? "Traitement..." : "Commander"}
                                 onPress={handleNextStep}
-                                style={styles.confirmButton}
                                 disabled={isLoading}
                             />
                         </View>
@@ -370,7 +467,7 @@ export default function CartScreen(): JSX.Element {
                             />
                         )}
                     </View>
-                </KeyboardAvoidingView>
+                </KeyboardAvoidingView >
             );
         }
     };
@@ -540,14 +637,9 @@ const styles = StyleSheet.create({
     buttonRow: {
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
         marginTop: 15,
-    },
-    backButton: {
-        flex: 1,
-        marginRight: 10,
-    },
-    confirmButton: {
-        flex: 1,
+        gap: 10,
     },
     loader: {
         marginTop: 15

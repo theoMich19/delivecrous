@@ -25,12 +25,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
 import { useFavorites } from '@/contexts/FavoritesContext';
 import PlateIllustration from '@/components/placeholders/PlateIllustration';
+import { useToast } from '@/contexts/ToastContext';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 
 export default function MenuScreen() {
     const { addToCart } = useCart();
     const { user } = useAuth();
+    const { showToast } = useToast();
     const { favorites, addFavorite, removeFavorite } = useFavorites();
 
     const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -413,7 +415,7 @@ export default function MenuScreen() {
                                 onPress={() => {
                                     const restaurantName = mealRestaurant ? mealRestaurant.name : "Restaurant inconnu";
                                     addToCart(selectedMeal, restaurantName);
-                                    alert(`${selectedMeal.name} ajouté au panier`);
+                                    showToast(`${selectedMeal.name} ajouté au panier`, 'success', 3000);
                                     setMealModalVisible(false);
                                 }}
                                 style={styles.orderButton}

@@ -1,7 +1,8 @@
-import React from 'react';
-import { StyleSheet, Text, View, TouchableOpacity, TextInput, SafeAreaView, StatusBar, ScrollView } from 'react-native';
+import { COLORS } from '@/styles/global';
+import React, { useRef } from 'react';
+import { StyleSheet, Text, View, TouchableOpacity, TextInput, SafeAreaView, StatusBar, ScrollView, Animated, Easing } from 'react-native';
 
-// Définition des types
+// Définition des types avec animation
 interface ButtonProps {
     title: string;
     onPress: () => void;
@@ -10,7 +11,6 @@ interface ButtonProps {
     textStyle?: object;
     disabled?: boolean;
 }
-
 interface InputProps {
     placeholder?: string;
     label?: string;
@@ -37,32 +37,65 @@ const Button: React.FC<ButtonProps> = ({
     textStyle,
     disabled = false
 }) => {
+    const scaleAnim = useRef(new Animated.Value(1)).current;
+
+    const handlePressIn = () => {
+        Animated.timing(scaleAnim, {
+            toValue: 0.95,
+            duration: 150,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true
+        }).start();
+    };
+
+    const handlePressOut = () => {
+        Animated.timing(scaleAnim, {
+            toValue: 1,
+            duration: 150,
+            easing: Easing.inOut(Easing.ease),
+            useNativeDriver: true
+        }).start();
+    };
+
+    const handlePress = () => {
+        if (!disabled) {
+            onPress();
+        }
+    };
+
     return (
-        <TouchableOpacity
-            style={[
-                styles.button,
-                variant === 'secondary' ? styles.buttonSecondary :
-                    variant === 'outline' ? styles.buttonOutline : styles.buttonPrimary,
-                disabled && styles.buttonDisabled,
-                style
-            ]}
-            onPress={onPress}
-            disabled={disabled}
-            activeOpacity={0.8}
+        <Animated.View
+            style={{
+                transform: [{ scale: scaleAnim }]
+            }}
         >
-            <Text style={[
-                styles.buttonText,
-                variant === 'secondary' ? styles.buttonTextSecondary :
-                    variant === 'outline' ? styles.buttonTextOutline : styles.buttonTextPrimary,
-                disabled && styles.buttonTextDisabled,
-                textStyle
-            ]}>
-                {title}
-            </Text>
-        </TouchableOpacity>
+            <TouchableOpacity
+                style={[
+                    styles.button,
+                    variant === 'secondary' ? styles.buttonSecondary :
+                        variant === 'outline' ? styles.buttonOutline : styles.buttonPrimary,
+                    disabled && styles.buttonDisabled,
+                    style
+                ]}
+                onPress={handlePress}
+                onPressIn={handlePressIn}
+                onPressOut={handlePressOut}
+                disabled={disabled}
+                activeOpacity={1}
+            >
+                <Text style={[
+                    styles.buttonText,
+                    variant === 'secondary' ? styles.buttonTextSecondary :
+                        variant === 'outline' ? styles.buttonTextOutline : styles.buttonTextPrimary,
+                    disabled && styles.buttonTextDisabled,
+                    textStyle
+                ]}>
+                    {title}
+                </Text>
+            </TouchableOpacity>
+        </Animated.View>
     );
 };
-
 // Composant Heading (=Titre)
 const Heading: React.FC<TextComponentProps> = ({ children, style }) => {
     return <Text style={[styles.title, style]}>{children}</Text>;
@@ -113,105 +146,6 @@ const Input: React.FC<InputProps> = ({
     );
 };
 
-// Page de test si besoins pour preview, call le composant directement
-const CrousComponentsPage: React.FC = () => {
-    return (
-        <SafeAreaView style={styles.container}>
-            <StatusBar barStyle="light-content" backgroundColor="#004A8F" />
-            <View style={styles.header}>
-                <Text style={styles.headerText}>CROUS Services</Text>
-            </View>
-            <ScrollView contentContainerStyle={styles.scrollContainer}>
-                <View style={styles.section}>
-                    <Heading>Services Étudiants</Heading>
-
-                    <View style={styles.componentContainer}>
-                        <Text style={styles.componentTitle}>Titre</Text>
-                        <Heading>Résidences universitaires</Heading>
-                    </View>
-
-                    <View style={styles.componentContainer}>
-                        <Text style={styles.componentTitle}>Sous-titre</Text>
-                        <SubHeading>Demande de logement étudiant</SubHeading>
-                    </View>
-
-                    <View style={styles.componentContainer}>
-                        <Text style={styles.componentTitle}>Texte normal</Text>
-                        <RegularText>
-                            Les CROUS proposent des logements étudiants à loyer modéré dans
-                            toute la France. Ces résidences sont attribuées en priorité aux
-                            étudiants boursiers sur critères sociaux.
-                        </RegularText>
-                    </View>
-
-                    <View style={styles.componentContainer}>
-                        <Text style={styles.componentTitle}>Champ de saisie</Text>
-                        <Input
-                            label="Identifiant de connexion"
-                            placeholder="Numéro INE ou identifiant"
-                        />
-                    </View>
-
-                    <View style={styles.componentContainer}>
-                        <Text style={styles.componentTitle}>Champ de saisie avec erreur</Text>
-                        <Input
-                            label="Mot de passe"
-                            placeholder="Votre mot de passe"
-                            secureTextEntry
-                            error="Le mot de passe doit contenir au moins 8 caractères"
-                        />
-                    </View>
-
-                    <View style={styles.componentContainer}>
-                        <Text style={styles.componentTitle}>Bouton Principal</Text>
-                        <Button title="Se connecter" onPress={() => alert('Connexion')} />
-                    </View>
-
-                    <View style={styles.componentContainer}>
-                        <Text style={styles.componentTitle}>Bouton Secondaire</Text>
-                        <Button
-                            title="Créer un compte"
-                            variant="secondary"
-                            onPress={() => alert('Création de compte')}
-                        />
-                    </View>
-
-                    <View style={styles.componentContainer}>
-                        <Text style={styles.componentTitle}>Bouton Outline</Text>
-                        <Button
-                            title="Mot de passe oublié"
-                            variant="outline"
-                            onPress={() => alert('Mot de passe oublié')}
-                        />
-                    </View>
-
-                    <View style={styles.componentContainer}>
-                        <Text style={styles.componentTitle}>Bouton Désactivé</Text>
-                        <Button
-                            title="Valider le formulaire"
-                            disabled={true}
-                            onPress={() => alert('Validation')}
-                        />
-                    </View>
-                </View>
-            </ScrollView>
-        </SafeAreaView>
-    );
-};
-
-// List couleurs && correspondances
-const COLORS = {
-    primary: '#004A8F', // Bleu marine officiel
-    primaryLight: '#0072CE', // Bleu clair
-    secondary: '#00CCBC', // Nouvelle couleur secondaire (Deliveroo style)
-    accent: '#EF4123', // Rouge accent
-    background: '#F5F7FA', // Fond gris clair
-    cardBg: '#FFFFFF',    // Fond carte
-    text: '#333333',      // Texte principal
-    textSecondary: '#4E5968', // Texte secondaire
-    border: '#DFE1E6',    // Bordures
-    tag: '#F5F5F7',       // Fond des tags
-};
 
 // Styles defauts composants
 const styles = StyleSheet.create({
@@ -351,5 +285,3 @@ const styles = StyleSheet.create({
 });
 
 export { Button, Heading, SubHeading, RegularText, Input };
-
-export default CrousComponentsPage;
