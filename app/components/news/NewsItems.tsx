@@ -15,7 +15,6 @@ const NewsItem: React.FC<NewsItemProps> = ({ item }) => {
                 source={{ uri: item.imageUrl }}
                 style={styles.newsImage}
                 defaultSource={require('@assets/images/default42.png')}
-                onError={() => console.log('Erreur de chargement')}
             />
             <View style={styles.newsContent}>
                 <SubHeading style={styles.newsTitle}>{item.title}</SubHeading>

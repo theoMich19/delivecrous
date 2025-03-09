@@ -34,7 +34,7 @@ export default function MenuScreen() {
     const { user } = useAuth();
     const { showToast } = useToast();
     const { favorites, addFavorite, removeFavorite } = useFavorites();
-
+    const favoriteAnimRef = useRef(new Animated.Value(1)).current;
     const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
     const [categories, setCategories] = useState<Category[]>([]);
     const [meals, setMeals] = useState<Meal[]>([]);
@@ -127,6 +127,32 @@ export default function MenuScreen() {
         setSelectedMeal(meal);
         setMealModalVisible(true);
     }, []);
+
+    const handleFavoritePress = useCallback((mealId: string) => {
+        Animated.sequence([
+            Animated.timing(favoriteAnimRef, {
+                toValue: 0.7,
+                duration: 100,
+                useNativeDriver: true
+            }),
+            Animated.spring(favoriteAnimRef, {
+                toValue: 1.2,
+                friction: 2,
+                tension: 120,
+                useNativeDriver: true
+            }),
+            Animated.spring(favoriteAnimRef, {
+                toValue: 1,
+                friction: 3,
+                tension: 40,
+                useNativeDriver: true
+            })
+        ]).start();
+
+        setTimeout(() => {
+            toggleFavorite(mealId);
+        }, 100);
+    }, [toggleFavorite]);
 
 
     const CategoryItem = ({ item, isSelected, onSelect }: {
@@ -295,13 +321,15 @@ export default function MenuScreen() {
                             </TouchableOpacity>
                             <TouchableOpacity
                                 style={styles.favoriteButton}
-                                onPress={() => toggleFavorite(selectedMeal.id)}
+                                onPress={() => handleFavoritePress(selectedMeal.id)}
                             >
-                                <Ionicons
-                                    name={isFavorite ? "heart" : "heart-outline"}
-                                    size={28}
-                                    color={isFavorite ? COLORS.accent : COLORS.text}
-                                />
+                                <Animated.View style={{ transform: [{ scale: favoriteAnimRef }] }}>
+                                    <Ionicons
+                                        name={isFavorite ? "heart" : "heart-outline"}
+                                        size={28}
+                                        color={isFavorite ? COLORS.accent : "white"}
+                                    />
+                                </Animated.View>
                             </TouchableOpacity>
                         </View>
 
